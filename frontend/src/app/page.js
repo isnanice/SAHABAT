@@ -11,9 +11,9 @@ import {
   Lock, 
   ShieldOff, 
   GraduationCap,
-  MessageCircle,
-  ShieldCheck
+  MessageCircle
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
 
@@ -122,10 +122,16 @@ export default function RedesignLanding() {
           Lewati ke konten utama
         </a>
         <Link href="/" aria-label="SAHABAT home" className={styles.logoLink}>
-          <div className={styles.logoIcon}>
-            <ShieldCheck size={32} />
+          <div className={styles.logoImageWrap}>
+            <Image 
+              src="/logo.png" 
+              alt="Logo SAHABAT" 
+              width={140} 
+              height={50} 
+              className={styles.logoImg}
+              priority
+            />
           </div>
-          <span className={styles.logoText}>SAHABAT</span>
         </Link>
         
         <nav aria-label="Navigasi utama" className={styles.navContainer}>

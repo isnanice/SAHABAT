@@ -47,15 +47,13 @@
   text-decoration: none;
 }
 
-.logoIcon {
-  width: 50px;
-  height: 50px;
-  background-color: #2563eb;
-  border-radius: 50%;
+.logoImageWrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+}
+.logoImg {
+  object-fit: contain;
 }
 
 .logoText {
@@ -133,8 +131,11 @@
 .heroSection {
   display: flex;
   flex-direction: column;
-  padding: 60px 5%;
-  background: linear-gradient(to bottom right, #dbeafe, #eef2ff);
+  padding: 60px 8%;
+  background: linear-gradient(rgba(228, 238, 255, 0.85), rgba(228, 238, 255, 0.85)), url('/hero-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: calc(100vh - 90px);
 }
 @media (min-width: 1024px) {
@@ -147,7 +148,7 @@
 
 .heroLeft {
   flex: 1;
-  max-width: 700px;
+  max-width: 800px;
   margin-bottom: 60px;
 }
 
@@ -200,7 +201,7 @@
 .heroRight {
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -334,8 +335,7 @@
 .sectionHeader {
   text-align: center;
   margin-bottom: 50px;
-  max-width: 800px;
-  margin-inline: auto;
+  width: 100%;
 }
 .sectionTitle {
   font-size: clamp(28px, 4vw, 40px);
@@ -351,7 +351,7 @@
 
 /* Tentang Section */
 .tentangSection {
-  padding: 80px 5%;
+  padding: 80px 8%;
   background-color: #ffffff;
 }
 
@@ -403,16 +403,15 @@
 
 /* Fitur Section */
 .fiturSection {
-  padding: 80px 5%;
-  background-color: #f8fafc;
+  padding: 80px 8%;
+  background-color: #e4eeff;
 }
 
 .featureGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 30px;
-  max-width: 1000px;
-  margin-inline: auto;
+  width: 100%;
 }
 @media (min-width: 768px) {
   .featureGrid { grid-template-columns: repeat(2, 1fr); }
@@ -467,7 +466,7 @@
 
 /* Edukasi Section */
 .edukasiSection {
-  padding: 80px 5%;
+  padding: 80px 8%;
   background-color: #ffffff;
 }
 
