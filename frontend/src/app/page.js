@@ -20,8 +20,8 @@ import styles from "./page.module.css";
 export default function RedesignLanding() {
   const navItems = useMemo(
     () => [
-      { label: "Beranda", href: "#main-content", active: true },
-      { label: "Tentang", href: "#tentang", active: false },
+      { label: "Beranda", href: "/", active: true },
+      { label: "Tentang", href: "/tentang", active: false },
       { label: "Fitur", href: "#fitur", active: false },
       { label: "Edukasi", href: "#edukasi", active: false },
     ],
