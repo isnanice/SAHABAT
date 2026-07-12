@@ -22,8 +22,8 @@ export default function RedesignLanding() {
     () => [
       { label: "Beranda", href: "/", active: true },
       { label: "Tentang", href: "/tentang", active: false },
-      { label: "Fitur", href: "#fitur", active: false },
-      { label: "Edukasi", href: "#edukasi", active: false },
+      { label: "Fitur", href: "/fitur", active: false },
+      { label: "Edukasi", href: "/edukasi", active: false },
     ],
     [],
   );
@@ -33,23 +33,20 @@ export default function RedesignLanding() {
       {
         title: "Takut Identitas Terungkap",
         text: "Sistem anonimitas kami memastikan identitas kamu aman. Kamu pegang kendali penuh atas informasi apa saja yang ingin dibagikan.",
-        IconComponent: Lock,
-        iconColor: "#16a34a", // text-green-600
-        iconBg: "#dcfce7", // bg-green-100
+        iconPath: "/takutidentitasterungkap.svg",
+        iconBg: "#E0F9E8", 
       },
       {
         title: "Takut Pembalasan",
         text: "Laporan kamu langsung masuk ke konselor sekolah secara rahasia, memungkinkan tindakan pencegahan yang bijaksana tanpa membahayakanmu.",
-        IconComponent: ShieldOff,
-        iconColor: "#dc2626", // text-red-600
-        iconBg: "#fee2e2", // bg-red-100
+        iconPath: "/takutpembalasan.svg",
+        iconBg: "#FFDAD6", 
       },
       {
         title: "Merasa Sendiri & Lemah",
         text: "Kamu tidak sendiri, banyak yang peduli dan siap membantu. Kami menghubungkan kamu dengan dukungan profesional dan teman sebaya.",
-        IconComponent: Brain,
-        iconColor: "#d97706", // text-amber-600
-        iconBg: "#fef3c7", // bg-amber-100
+        iconPath: "/merasasendiri&lemah.svg",
+        iconBg: "#FEF3DB", 
       },
     ],
     [],
@@ -58,32 +55,32 @@ export default function RedesignLanding() {
   const featureTextCards = useMemo(
     () => [
       {
-        title: "Curhat Anonim",
+        title: "Ruang Aman",
         description: "Laporkan kejadian atau sekadar berbagi perasaan tanpa mengungkapkan identitasmu. Sistem kami mengenkripsi data kamu untuk perlindungan privasi total.",
-        IconComponent: Lock,
-        iconColor: "#3525cd",
-        iconBg: "#e0e7ff",
+        iconPath: "/ruangaman.svg",
+        iconBg: "#E9F1FF",
+        imagePath: "/ruangaman.png",
+        isLarge: true
       },
       {
-        title: "Lacak Laporan",
-        description: "Pantau status laporan Anda secara real-time. Ketahui kapan konselor mulai menangani kasus kamu.",
-        IconComponent: FileText,
-        iconColor: "#d97706",
-        iconBg: "#fef3c7",
+        title: "Lapor Insiden",
+        description: "Buat laporan resmi terkait masalah yang kamu alami untuk ditindaklanjuti secara profesional oleh Guru BK.",
+        iconPath: "/laporinsiden.svg",
+        iconBg: "#FEF3DB",
       },
       {
         title: "Ruang Dukungan Sebaya",
         description: "Forum moderasi tertutup di mana siswa dapat saling memberikan dukungan emosional secara aman.",
-        IconComponent: Users,
-        iconColor: "#16a34a",
-        iconBg: "#dcfce7",
+        iconPath: "/ruangdukungansebaya.svg",
+        iconBg: "#E0F9E8",
       },
       {
         title: "Konseling BK",
         description: "Jadwal sesi dengan Guru BK, pilih tatap muka atau online. Identitas terlindungi sepenuhnya.",
-        IconComponent: HeartHandshake,
-        iconColor: "#dc2626",
-        iconBg: "#fee2e2",
+        iconPath: "/konselingbk.svg",
+        iconBg: "#FFDAD6",
+        imagePath: "/konselingbk.png",
+        isLarge: true
       },
     ],
     [],
@@ -251,11 +248,10 @@ export default function RedesignLanding() {
           
           <div className={styles.reasonGrid}>
             {reasonCards.map((card, i) => {
-              const IconComponent = card.IconComponent;
               return (
                 <article key={i} className={styles.reasonCard}>
-                  <div className={styles.reasonIconWrap} style={{backgroundColor: card.iconBg, color: card.iconColor}}>
-                    <IconComponent size={36} />
+                  <div className={styles.reasonIconWrap} style={{backgroundColor: card.iconBg}}>
+                    <Image src={card.iconPath} alt={card.title} width={36} height={36} />
                   </div>
                   <h3 className={styles.reasonTitle}>{card.title}</h3>
                   <p className={styles.reasonDesc}>{card.text}</p>
@@ -279,18 +275,24 @@ export default function RedesignLanding() {
           
           <div className={styles.featureGrid}>
             {featureTextCards.map((card, i) => {
-              const IconComponent = card.IconComponent;
               return (
-                <article key={i} className={styles.featureCard}>
-                  <div className={styles.featureIconBox} style={{backgroundColor: card.iconBg, color: card.iconColor}}>
-                    <IconComponent size={32} />
+                <article key={i} className={`${styles.featureCard} ${card.isLarge ? styles.featureCardLarge : ''}`}>
+                  <div className={styles.featureCardContent}>
+                    <div className={styles.featureIconBox} style={{backgroundColor: card.iconBg}}>
+                      <Image src={card.iconPath} alt={card.title} width={32} height={32} />
+                    </div>
+                    <h3 className={styles.featureTitle}>{card.title}</h3>
+                    <p className={styles.featureDesc}>{card.description}</p>
+                    <Link href="#pelajari-lebih-lanjut" className={styles.featureLink}>
+                      Pelajari Lebih Lanjut
+                      <ArrowUpRight size={20} />
+                    </Link>
                   </div>
-                  <h3 className={styles.featureTitle}>{card.title}</h3>
-                  <p className={styles.featureDesc}>{card.description}</p>
-                  <Link href="#pelajari-lebih-lanjut" className={styles.featureLink}>
-                    Pelajari Lebih Lanjut
-                    <ArrowUpRight size={20} />
-                  </Link>
+                  {card.imagePath && (
+                    <div className={styles.featureCardImageWrap}>
+                      <Image src={card.imagePath} alt={card.title} width={761} height={275} className={styles.featureCardImage} />
+                    </div>
+                  )}
                 </article>
               );
             })}

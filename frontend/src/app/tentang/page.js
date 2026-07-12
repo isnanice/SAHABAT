@@ -17,8 +17,8 @@ export default function TentangPage() {
     () => [
       { label: "Beranda", href: "/", active: false },
       { label: "Tentang", href: "/tentang", active: true },
-      { label: "Fitur", href: "/#fitur", active: false },
-      { label: "Edukasi", href: "/#edukasi", active: false },
+      { label: "Fitur", href: "/fitur", active: false },
+      { label: "Edukasi", href: "/edukasi", active: false },
     ],
     [],
   );
@@ -33,23 +33,20 @@ export default function TentangPage() {
       {
         title: "Perlindungan Anonim",
         text: "Menyediakan saluran pelaporan yang aman dan terenkripsi untuk mencegah retaliasi.",
-        IconComponent: Shield,
-        iconColor: "#3525cd", 
-        iconBg: "#e0e7ff", 
+        iconPath: "/perlindungananonim.svg",
+        iconBg: "#D3E4FE", 
       },
       {
         title: "Dukungan Sebaya",
         text: "Membangun komunitas siswa yang peduli dan siap mendengarkan cerita teman sebayanya.",
-        IconComponent: HeartHandshake,
-        iconColor: "#3525cd", 
-        iconBg: "#e0e7ff", 
+        iconPath: "/dukungansebaya.svg",
+        iconBg: "#D3E4FE", 
       },
       {
         title: "Intervensi Profesional",
         text: "Menghubungkan kasus-kasus yang membutuhkan perhatian khusus langsung ke Guru BK dengan data yang akurat dan terstruktur.",
-        IconComponent: User,
-        iconColor: "#3525cd", 
-        iconBg: "#e0e7ff", 
+        iconPath: "/intervensiprofesional.svg",
+        iconBg: "#D3E4FE", 
       },
     ],
     [],
@@ -81,18 +78,22 @@ export default function TentangPage() {
       {
         title: "Konselor (Guru BK)",
         text: "Tenaga pendidik profesional yang siap menganalisa laporan, memberikan konseling lanjutan, dan merancang program pencegahan komprehensif.",
-        IconComponent: User,
+        iconPath: "/konselor.svg",
+        iconBg: "#E7F0FF",
         badgeText: "Profesional Terlatih",
+        badgeIconPath: "/profesionalterlatih.svg",
         badgeColor: "#3b82f6",
-        badgeBg: "#eff6ff",
+        badgeBg: "#E9F1FF",
       },
       {
         title: "Peer Supporter",
         text: "Siswa terpilih yang dilatih untuk menjadi pendengar yang baik, memberikan empati, dan mendampingi teman sebaya dalam keseharian di sekolah.",
-        IconComponent: Users,
+        iconPath: "/peersupporter.svg",
+        iconBg: "#E7F0FF",
         badgeText: "Teman Cerita",
+        badgeIconPath: "/temancerita.svg",
         badgeColor: "#16a34a",
-        badgeBg: "#dcfce7",
+        badgeBg: "#E0F9E8",
       },
     ],
     [],
@@ -183,8 +184,8 @@ export default function TentangPage() {
               <span>Visi</span>
             </div>
             <article className={styles.visiCard}>
-              <div className={styles.visiIconWrap}>
-                <Eye size={36} />
+              <div className={styles.visiIconWrap} style={{backgroundColor: "#D3E4FE"}}>
+                <Image src="/visi.svg" alt="Visi" width={36} height={36} />
               </div>
               <p className={styles.visiDesc}>
                 Menjadi platform perlindungan siswa terdepan di Indonesia yang memastikan 
@@ -201,11 +202,10 @@ export default function TentangPage() {
             </div>
             <div className={styles.misiGrid}>
               {misiCards.map((card, i) => {
-                const IconComponent = card.IconComponent;
                 return (
                   <article key={i} className={styles.misiCard}>
-                    <div className={styles.misiIconWrap} style={{backgroundColor: card.iconBg, color: card.iconColor}}>
-                      <IconComponent size={28} />
+                    <div className={styles.misiIconWrap} style={{backgroundColor: card.iconBg}}>
+                      <Image src={card.iconPath} alt={card.title} width={28} height={28} />
                     </div>
                     <h3 className={styles.misiTitle}>{card.title}</h3>
                     <p className={styles.misiDesc}>{card.text}</p>
@@ -247,11 +247,10 @@ export default function TentangPage() {
           
           <div className={styles.timGrid}>
             {timCards.map((card, i) => {
-              const IconComponent = card.IconComponent;
               return (
                 <article key={i} className={styles.timCard}>
-                  <div className={styles.timIconWrap}>
-                    <IconComponent size={36} color="#3525cd" />
+                  <div className={styles.timIconWrap} style={{backgroundColor: card.iconBg}}>
+                    <Image src={card.iconPath} alt={card.title} width={36} height={36} />
                   </div>
                   <h3 className={styles.timTitle}>{card.title}</h3>
                   <p className={styles.timDesc}>{card.text}</p>
@@ -259,7 +258,9 @@ export default function TentangPage() {
                     className={styles.timBadge} 
                     style={{backgroundColor: card.badgeBg, color: card.badgeColor}}
                   >
-                    <Shield size={14} className={styles.badgeIcon} />
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px'}}>
+                      <Image src={card.badgeIconPath} alt={card.badgeText} width={14} height={14} />
+                    </div>
                     {card.badgeText}
                   </div>
                 </article>

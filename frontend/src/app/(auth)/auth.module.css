@@ -1,0 +1,252 @@
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+}
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.logoWrap img {
+  height: 32px;
+  object-fit: contain;
+}
+
+.cardTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.cardSubtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+}
+
+.tab.active {
+  color: #3525CD;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #3525CD;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #334155;
+  transition: border-color 0.2s;
+  background-color: #ffffff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3525CD;
+}
+
+.passwordWrap {
+  position: relative;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.checkboxWrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 20px;
+  margin-bottom: 24px;
+}
+
+.checkbox {
+  margin-top: 2px;
+}
+
+.checkboxLabel {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.checkboxLabel a {
+  color: #3525CD;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: #3525CD;
+  color: #ffffff;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+}
+
+.submitBtnOutline {
+  width: 100%;
+  padding: 14px;
+  background-color: #ffffff;
+  color: #3525CD;
+  border: 1px solid #3525CD;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+.submitBtnOutline:hover {
+  background-color: #f8fafc;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider::before {
+  margin-right: 12px;
+}
+
+.divider::after {
+  margin-left: 12px;
+}
+
+.googleBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.googleBtn:hover {
+  background-color: #f8fafc;
+}
+
+.footerText {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.footerText a {
+  color: #3525CD;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.forgotLink {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: #3525CD;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: -8px;
+  margin-bottom: 24px;
+}
+
+.successBox {
+  background-color: #dcfce7;
+  color: #166534;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}

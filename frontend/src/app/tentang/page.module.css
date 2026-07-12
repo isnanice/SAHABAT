@@ -260,7 +260,7 @@
   height: 80px;
   background-color: #e0e7ff;
   color: #3525cd;
-  border-radius: 50%;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -417,7 +417,7 @@
   width: 80px;
   height: 80px;
   background-color: #e0e7ff;
-  border-radius: 50%;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
