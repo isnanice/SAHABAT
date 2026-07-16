@@ -30,20 +30,19 @@ export default function FiturPage() {
         cta: "Mulai di Ruang Aman",
       },
       {
-        title: "Lapor Insiden",
-        description: "Sudah tahu mau cerita apa? Tulis langsung tanpa lewat chat. Laporanmu masuk ke antrean Guru BK sekolahmu.",
-        iconPath: "/laporinsiden.svg",
-        iconBg: "#FEF3DB",
-        href: "/lapor",
-        cta: "Lapor Sekarang",
-      },
-      {
         title: "Lacak Laporan",
         description: "Pantau laporanmu pakai kode tiket. Lihat statusnya dan balasan Guru BK, tanpa login dan tanpa menyebut namamu.",
         iconPath: "/dukungansebaya.svg",
         iconBg: "#E0F9E8",
         href: "/cek-laporan",
         cta: "Cek Laporan Saya",
+      },
+      {
+        title: "Ruang Dukungan Sebaya",
+        description: "Forum moderasi tertutup tempat siswa saling mendukung, diawasi Guru BK.",
+        iconPath: "/peersupporter.svg",
+        iconBg: "#F3E8FF",
+        segera: true,
       },
       {
         title: "Konseling BK",
@@ -85,8 +84,8 @@ export default function FiturPage() {
           ))}
         </nav>
         <div className={styles.authButtons}>
-          <Link href="/login" className={styles.loginBtn}>Login</Link>
-          <Link href="/login" className={styles.signInBtn}>Sign In</Link>
+          <Link href="/login" className={styles.loginBtn}>Masuk</Link>
+          <Link href="/register" className={styles.signInBtn}>Daftar</Link>
         </div>
       </header>
 

@@ -53,6 +53,9 @@ export default function EdukasiPage() {
   return (
     <div className={styles.pageWrapper}>
       <header className={styles.header}>
+        <a href="#main-content" className={styles.skipLink}>
+          Lewati ke konten utama
+        </a>
         <Link href="/" aria-label="SAHABAT home" className={styles.logoLink}>
           <div className={styles.logoImageWrap}>
             <Image src="/logo.png" alt="Logo SAHABAT" width={140} height={50} className={styles.logoImg} priority />
@@ -68,7 +71,7 @@ export default function EdukasiPage() {
         </nav>
         <div className={styles.authButtons}>
           <Link href="/login" className={styles.loginBtn}>Masuk</Link>
-          <Link href="/login" className={styles.signInBtn}>Daftar</Link>
+          <Link href="/register" className={styles.signInBtn}>Daftar</Link>
         </div>
       </header>
 

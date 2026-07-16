@@ -414,7 +414,7 @@
   width: 100%;
 }
 @media (min-width: 1024px) {
-  .featureGrid { grid-template-columns: repeat(3, 1fr); }
+  .featureGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 .featureCard {
@@ -441,7 +441,6 @@
 }
 @media (min-width: 1024px) {
   .featureCardLarge {
-    grid-column: span 2;
     flex-direction: row;
     align-items: center;
   }
