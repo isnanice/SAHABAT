@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
+/* Token diambil dari desain citra (folder design/). */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --sahabat-ungu: #4f46e5;
+  --sahabat-ungu-tua: #4338ca;
+  --sahabat-ungu-muda: #eef2ff;
+  --sahabat-latar: #f5f7ff;
+  --sahabat-garis: #e5e7f5;
+  --sahabat-abu: #6b7280;
+
+  /* Merah darurat. Sengaja hanya dipakai panel krisis — kalau dipakai
+     untuk error biasa juga, sinyalnya jadi tumpul saat benar-benar perlu. */
+  --sahabat-darurat: #dc2626;
+  --sahabat-darurat-muda: #fef2f2;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-sahabat: var(--sahabat-ungu);
+  --color-sahabat-tua: var(--sahabat-ungu-tua);
+  --color-sahabat-muda: var(--sahabat-ungu-muda);
+  --color-sahabat-latar: var(--sahabat-latar);
+  --color-sahabat-garis: var(--sahabat-garis);
+  --color-darurat: var(--sahabat-darurat);
+  --color-darurat-muda: var(--sahabat-darurat-muda);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Dark mode SENGAJA tidak diaktifkan.
+   Default Next.js membalik warna lewat prefers-color-scheme, dan itu membuat
+   panel darurat merah tampil di atas latar gelap dengan kontras yang tidak
+   pernah kami uji. Sampai ada yang benar-benar mendesain versi gelapnya,
+   satu skema yang teruji lebih baik daripada dua yang tidak. */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
