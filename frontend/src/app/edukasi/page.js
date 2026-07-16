@@ -41,8 +41,12 @@ export default function EdukasiPage() {
     [],
   );
 
+  // Lihat catatan di app/page.js soal link footer yang dihapus.
   const footerLinks = useMemo(
-    () => ["Kebijakan Privasi", "Syarat & Ketentuan", "Kontak Darurat", "Pusat Bantuan"],
+    () => [
+      { label: "Kontak Darurat", href: "/kontak-darurat" },
+      { label: "Privasi & Data", href: "/privasi" },
+    ],
     [],
   );
 
@@ -87,14 +91,10 @@ export default function EdukasiPage() {
             <input type="text" className={styles.searchInput} placeholder="Cari artikel yang ingin dibaca" />
           </div>
 
-          <div className={styles.filterWrap}>
-            <button className={`${styles.filterBtn} ${styles.filterBtnActive}`}>Semua Topik</button>
-            <button className={styles.filterBtn}>Bullying</button>
-            <button className={styles.filterBtn}>Kesehatan Mental</button>
-            <button className={styles.filterBtn}>Dukungan Sosial</button>
-            <button className={styles.filterBtn}>Keamanan Digital</button>
-            <button className={styles.filterBtn}>Pengembangan Diri</button>
-          </div>
+          {/* Filter topik dihapus: belum ada logika penyaringnya, dan hanya ada
+              3 artikel. Tombol yang menyala saat diklik tapi tidak mengubah
+              apa pun lebih membingungkan daripada tidak ada tombol.
+              Kembalikan bersama filter yang sungguhan saat modul edukasi dibangun. */}
 
           <div className={styles.articleGrid}>
             {articles.map((article, i) => (
@@ -106,15 +106,20 @@ export default function EdukasiPage() {
                   <span className={styles.articleCategory}>{article.category}</span>
                   <h3 className={styles.articleTitle}>{article.title}</h3>
                   <p className={styles.articleDesc}>{article.description}</p>
-                  <Link href="#baca" className={styles.articleLink}>Baca Artikel &rarr;</Link>
+                  {/* Halaman artikelnya belum dibangun (modul edukasi di-skip
+                      untuk demo sesuai rencana). Sebelumnya href="#baca" —
+                      terlihat seperti link, tidak melakukan apa pun. */}
+                  <span className={styles.articleLink} style={{ color: '#9ca3af', cursor: 'default' }}>
+                    Segera hadir
+                  </span>
                 </div>
               </article>
             ))}
           </div>
 
-          <div className={styles.loadMoreWrap}>
-            <button className={styles.loadMoreBtn}>Muat Lebih Banyak</button>
-          </div>
+          {/* Tombol "Muat Lebih Banyak" dihapus: tidak ada artikel lain untuk
+              dimuat, dan tombol yang diklik lalu diam membuat pengguna mengira
+              situsnya rusak. */}
         </section>
       </main>
 
@@ -123,8 +128,8 @@ export default function EdukasiPage() {
           <p className={styles.footerCopyright}>© 2024 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu</p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link} className={styles.footerLinkWrap}>
-                <Link href="#" className={styles.footerLink}>{link}</Link>
+              <span key={link.href} className={styles.footerLinkWrap}>
+                <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && <span className={styles.footerDot}>•</span>}
               </span>
             ))}

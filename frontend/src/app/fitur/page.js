@@ -19,36 +19,49 @@ export default function FiturPage() {
 
   const featureTextCards = useMemo(
     () => [
+      // Sinkron dengan kartu di app/page.js. `segera: true` = belum dibangun,
+      // jadi tidak dirender sebagai link.
       {
         title: "Ruang Aman",
-        description: "Privasi Anda adalah prioritas utama kami. Fitur Curhat Anonim memastikan identitas kamu terlindungi saat melaporkan atau berbagi masalah.",
+        description: "Bingung mulai cerita dari mana? Asisten AI membantumu menyusun kejadiannya jadi laporan yang jelas untuk Guru BK. Kamu tetap anonim, dan sesinya punya ujung.",
         iconPath: "/ruangaman.svg",
         iconBg: "#E9F1FF",
+        href: "/ruang-aman",
+        cta: "Mulai di Ruang Aman",
       },
       {
         title: "Lapor Insiden",
-        description: "Buat laporan resmi terkait masalah yang kamu alami untuk ditindaklanjuti secara profesional oleh Guru BK.",
+        description: "Sudah tahu mau cerita apa? Tulis langsung tanpa lewat chat. Laporanmu masuk ke antrean Guru BK sekolahmu.",
         iconPath: "/laporinsiden.svg",
         iconBg: "#FEF3DB",
+        href: "/lapor",
+        cta: "Lapor Sekarang",
       },
       {
-        title: "Ruang Dukungan Sebaya",
-        description: "Forum moderasi tertutup di mana siswa dapat saling memberikan dukungan emosional secara aman.",
+        title: "Lacak Laporan",
+        description: "Pantau laporanmu pakai kode tiket. Lihat statusnya dan balasan Guru BK, tanpa login dan tanpa menyebut namamu.",
         iconPath: "/dukungansebaya.svg",
         iconBg: "#E0F9E8",
+        href: "/cek-laporan",
+        cta: "Cek Laporan Saya",
       },
       {
         title: "Konseling BK",
-        description: "Jadwal sesi dengan Guru BK, pilih tatap muka atau online. Identitas terlindungi sepenuhnya.",
+        description: "Jadwal sesi tatap muka atau online dengan Guru BK, lewat tiket anonimmu.",
         iconPath: "/konselingbk.svg",
         iconBg: "#FFDAD6",
+        segera: true,
       },
     ],
     [],
   );
 
+  // Lihat catatan di app/page.js soal link footer yang dihapus.
   const footerLinks = useMemo(
-    () => ["Kebijakan Privasi", "Syarat & Ketentuan", "Kontak Darurat", "Pusat Bantuan"],
+    () => [
+      { label: "Kontak Darurat", href: "/kontak-darurat" },
+      { label: "Privasi & Data", href: "/privasi" },
+    ],
     [],
   );
 
@@ -99,8 +112,11 @@ export default function FiturPage() {
               </div>
               <h2 className={styles.mainFeatureTitle}>{featureTextCards[0].title}</h2>
               <p className={styles.mainFeatureDesc}>{featureTextCards[0].description}</p>
-              <Link href="/siswa/lapor" className={styles.primaryBtn}>
-                Mulai Curhat Sekarang
+              {/* Kartu ini berjudul "Ruang Aman", jadi tombolnya harus ke
+                  Ruang Aman. Sebelumnya menunjuk /lapor — judul satu fitur,
+                  tujuan fitur lain. */}
+              <Link href={featureTextCards[0].href} className={styles.primaryBtn}>
+                {featureTextCards[0].cta}
               </Link>
             </div>
             <div className={styles.mainFeatureImageWrap}>
@@ -119,9 +135,15 @@ export default function FiturPage() {
                 </div>
                 <h3 className={styles.featureTitle}>{card.title}</h3>
                 <p className={styles.featureDesc}>{card.description}</p>
-                <Link href="#pelajari-lebih-lanjut" className={styles.featureLink}>
-                  Pelajari Lebih Lanjut <ArrowUpRight size={20} />
-                </Link>
+                {card.href ? (
+                  <Link href={card.href} className={styles.featureLink}>
+                    {card.cta || "Pelajari Lebih Lanjut"} <ArrowUpRight size={20} />
+                  </Link>
+                ) : (
+                  <span className={styles.featureLink} style={{ color: "#9ca3af", cursor: "default" }}>
+                    Segera hadir
+                  </span>
+                )}
               </article>
             ))}
           </div>
@@ -129,7 +151,7 @@ export default function FiturPage() {
           <div className={styles.ctaBanner}>
              <h2 className={styles.ctaTitle}>Sudah Siap Memulai Belum?</h2>
              <p className={styles.ctaDesc}>Gunakan fitur kami sekarang dan ambil langkah pertama menuju ruang yang lebih aman untuk bercerita.</p>
-             <Link href="/siswa/lapor" className={styles.ctaBtn}>Mulai Curhat</Link>
+             <Link href="/lapor" className={styles.ctaBtn}>Lapor Sekarang</Link>
           </div>
         </section>
       </main>
@@ -139,8 +161,8 @@ export default function FiturPage() {
           <p className={styles.footerCopyright}>© 2024 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu</p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link} className={styles.footerLinkWrap}>
-                <Link href="#" className={styles.footerLink}>{link}</Link>
+              <span key={link.href} className={styles.footerLinkWrap}>
+                <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && <span className={styles.footerDot}>•</span>}
               </span>
             ))}

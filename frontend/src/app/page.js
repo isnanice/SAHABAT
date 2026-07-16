@@ -32,7 +32,11 @@ export default function RedesignLanding() {
     () => [
       {
         title: "Takut Identitas Terungkap",
-        text: "Sistem anonimitas kami memastikan identitas kamu aman. Kamu pegang kendali penuh atas informasi apa saja yang ingin dibagikan.",
+        // "memastikan identitas kamu aman" adalah janji yang tidak bisa
+        // ditepati sistem: kami bisa tidak menyimpan namamu, tapi tidak bisa
+        // mencegah ceritamu sendiri menunjukkan siapa kamu. Klaim yang tepat
+        // itu spesifik, dan justru lebih menenangkan karena bisa dibuktikan.
+        text: "Kamu tidak perlu login dan tidak perlu menulis namamu — sistem ini memang tidak menyimpan siapa kamu. Kamu yang memutuskan apa saja yang ingin diceritakan.",
         iconPath: "/takutidentitasterungkap.svg",
         iconBg: "#E0F9E8", 
       },
@@ -54,33 +58,59 @@ export default function RedesignLanding() {
 
   const featureTextCards = useMemo(
     () => [
+      // `href` menentukan tujuan; `segera: true` menandai fitur yang BELUM
+      // dibangun. Sebelumnya keempat kartu memakai href="#pelajari-lebih-lanjut"
+      // yang tidak menuju ke mana pun — termasuk kartu Ruang Aman, sehingga
+      // chatbot-nya tidak terjangkau dari seluruh situs.
+      //
+      // Kartu tanpa `href` SENGAJA tidak dirender sebagai link. Mengarahkan
+      // "Pelajari Lebih Lanjut" ke halaman kosong lebih buruk daripada jujur
+      // bilang belum ada — juri yang mengklik dan mendarat di stub akan
+      // meragukan seluruh demo, bukan cuma fitur itu.
       {
         title: "Ruang Aman",
-        description: "Laporkan kejadian atau sekadar berbagi perasaan tanpa mengungkapkan identitasmu. Sistem kami mengenkripsi data kamu untuk perlindungan privasi total.",
+        description: "Bingung mulai cerita dari mana? Asisten AI membantumu menyusun kejadiannya jadi laporan yang jelas untuk Guru BK. Kamu tetap anonim, dan sesinya punya ujung — bukan ngobrol tanpa akhir.",
         iconPath: "/ruangaman.svg",
         iconBg: "#E9F1FF",
         imagePath: "/ruangaman.png",
-        isLarge: true
+        isLarge: true,
+        href: "/ruang-aman",
+        cta: "Mulai di Ruang Aman",
       },
       {
         title: "Lapor Insiden",
-        description: "Buat laporan resmi terkait masalah yang kamu alami untuk ditindaklanjuti secara profesional oleh Guru BK.",
+        description: "Sudah tahu mau cerita apa? Tulis langsung tanpa lewat chat. Laporanmu masuk ke antrean Guru BK sekolahmu.",
         iconPath: "/laporinsiden.svg",
         iconBg: "#FEF3DB",
+        href: "/lapor",
+        cta: "Lapor Sekarang",
       },
       {
-        title: "Ruang Dukungan Sebaya",
-        description: "Forum moderasi tertutup di mana siswa dapat saling memberikan dukungan emosional secara aman.",
+        title: "Lacak Laporan",
+        description: "Pantau laporanmu pakai kode tiket. Lihat statusnya dan balasan Guru BK, tanpa perlu login dan tanpa menyebut namamu.",
         iconPath: "/ruangdukungansebaya.svg",
         iconBg: "#E0F9E8",
+        href: "/cek-laporan",
+        cta: "Cek Laporan Saya",
       },
       {
+        // Belum dibangun (rencana kita men-skip-nya untuk demo). "Identitas
+        // terlindungi sepenuhnya" juga dihapus — itu klaim absolut yang tidak
+        // bisa dijanjikan, sekelas dengan klaim E2EE yang sudah kita buang.
         title: "Konseling BK",
-        description: "Jadwal sesi dengan Guru BK, pilih tatap muka atau online. Identitas terlindungi sepenuhnya.",
+        description: "Jadwal sesi tatap muka atau online dengan Guru BK, lewat tiket anonimmu.",
         iconPath: "/konselingbk.svg",
         iconBg: "#FFDAD6",
         imagePath: "/konselingbk.png",
-        isLarge: true
+        isLarge: true,
+        segera: true,
+      },
+      {
+        title: "Ruang Dukungan Sebaya",
+        description: "Forum moderasi tertutup tempat siswa saling mendukung, diawasi Guru BK.",
+        iconPath: "/peersupporter.svg",
+        iconBg: "#F3E8FF",
+        segera: true,
       },
     ],
     [],
@@ -91,7 +121,10 @@ export default function RedesignLanding() {
       {
         number: "1",
         title: "Cerita Anonim",
-        text: "Tulis apa yang kamu alami di RuangAman. Tidak perlu nama, 100% aman dan tidak ada yang tahu identitasmu.",
+        // "100% aman" dan "tidak ada yang tahu identitasmu" adalah klaim
+        // absolut. Anak yang percaya "100%" lalu ketahuan justru mengalami
+        // kerugian yang sistem ini ada untuk mencegah.
+        text: "Tulis apa yang kamu alami di RuangAman. Tidak perlu nama — Guru BK akan membaca ceritamu, tapi tidak bisa melihat namamu dari sistem ini.",
       },
       {
         number: "2",
@@ -107,8 +140,18 @@ export default function RedesignLanding() {
     [],
   );
 
+  // Sebelumnya keempatnya href="#" — tidak melakukan apa pun.
+  // "Kontak Darurat" adalah link paling berbahaya di situs ini kalau mati:
+  // satu-satunya yang mungkin diklik anak yang sedang panik.
+  //
+  // "Syarat & Ketentuan" dan "Pusat Bantuan" DIHAPUS, bukan diberi halaman
+  // kosong. Keduanya butuh isi sungguhan yang belum ada; link ke halaman
+  // kosong cuma memindahkan kekecewaan satu klik lebih jauh.
   const footerLinks = useMemo(
-    () => ["Kebijakan Privasi", "Syarat & Ketentuan", "Kontak Darurat", "Pusat Bantuan"],
+    () => [
+      { label: "Kontak Darurat", href: "/kontak-darurat" },
+      { label: "Privasi & Data", href: "/privasi" },
+    ],
     [],
   );
 
@@ -167,12 +210,17 @@ export default function RedesignLanding() {
               untuk berbagi, melaporkan, dan mendapatkan bantuan yang mereka
               butuhkan.
             </p>
+            {/* Dua tombol besar sesuai spec §4.1A.
+                Sebelumnya keduanya menunjuk /siswa/* — route yang masuk matcher
+                middleware, jadi anak yang menekan "lapor" justru dilempar ke
+                halaman LOGIN. Untuk kanal yang seluruh gunanya melapor tanpa
+                identitas, itu kegagalan yang membatalkan produknya. */}
             <div className={styles.heroActions}>
-              <Link href="/siswa/lapor" className={styles.ctaBtnPrimary}>
-                Mulai Curhat Sekarang
+              <Link href="/lapor" className={styles.ctaBtnPrimary}>
+                Lapor Sekarang
               </Link>
-              <Link href="/siswa/lacak" className={styles.ctaBtnSecondary}>
-                Lacak Laporan
+              <Link href="/cek-laporan" className={styles.ctaBtnSecondary}>
+                Cek Laporan Saya
               </Link>
             </div>
           </div>
@@ -218,8 +266,18 @@ export default function RedesignLanding() {
                       <GraduationCap size={16} />
                     </div>
                     <div className={styles.statusContent}>
-                      <h4>Laporan #SBT-001</h4>
-                      <p>Guru BK merespons 10 menit lalu</p>
+                      {/* Kode contoh sengaja memakai format asli: acak, bukan
+                          berurutan. "#SBT-001" mengajarkan pembaca bahwa tiket
+                          bisa dihitung — dan kalau ada yang meniru pola itu ke
+                          implementasi, siapa pun bisa menebak SBT-002 lalu
+                          membaca laporan anak lain.
+
+                          "merespons 10 menit lalu" juga dihapus: rasio 1 Guru
+                          BK : 150 siswa (Permendikbud 111/2014) membuat janji
+                          itu mustahil, dan spec §1b mewajibkan menampilkan
+                          ekspektasi 1×24 jam sekolah. */}
+                      <h4>Laporan SAH-K4PM-9TXQ</h4>
+                      <p>Guru BK biasanya membalas dalam 1×24 jam sekolah</p>
                       <div className={styles.chatDots}>
                         <div className={styles.chatDot} style={{backgroundColor: '#21c55e'}} />
                         <div className={styles.chatDot} style={{backgroundColor: '#21c55e'}} />
@@ -283,10 +341,22 @@ export default function RedesignLanding() {
                     </div>
                     <h3 className={styles.featureTitle}>{card.title}</h3>
                     <p className={styles.featureDesc}>{card.description}</p>
-                    <Link href="#pelajari-lebih-lanjut" className={styles.featureLink}>
-                      Pelajari Lebih Lanjut
-                      <ArrowUpRight size={20} />
-                    </Link>
+
+                    {/* Kartu yang belum dibangun tidak dirender sebagai link.
+                        Label "Segera hadir" jujur; link ke halaman kosong tidak. */}
+                    {card.href ? (
+                      <Link href={card.href} className={styles.featureLink}>
+                        {card.cta || "Pelajari Lebih Lanjut"}
+                        <ArrowUpRight size={20} />
+                      </Link>
+                    ) : (
+                      <span
+                        className={styles.featureLink}
+                        style={{ color: "#9ca3af", cursor: "default" }}
+                      >
+                        Segera hadir
+                      </span>
+                    )}
                   </div>
                   {card.imagePath && (
                     <div className={styles.featureCardImageWrap}>
@@ -337,8 +407,8 @@ export default function RedesignLanding() {
               </p>
             </div>
             <div className={styles.bannerAction}>
-              <Link href="/siswa/lapor" className={styles.bannerBtn}>
-                Mulai Curhat Sekarang
+              <Link href="/lapor" className={styles.bannerBtn}>
+                Lapor Sekarang
               </Link>
             </div>
             <div className={styles.bannerIll} />
@@ -353,8 +423,8 @@ export default function RedesignLanding() {
           </p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link} className={styles.footerLinkWrap}>
-                <Link href="#" className={styles.footerLink}>{link}</Link>
+              <span key={link.href} className={styles.footerLinkWrap}>
+                <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && (
                   <span className={styles.footerDot}>•</span>
                 )}

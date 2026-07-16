@@ -23,8 +23,12 @@ export default function TentangPage() {
     [],
   );
 
+  // Lihat catatan di app/page.js soal link footer yang dihapus.
   const footerLinks = useMemo(
-    () => ["Kebijakan Privasi", "Syarat & Ketentuan", "Kontak Darurat", "Pusat Bantuan"],
+    () => [
+      { label: "Kontak Darurat", href: "/kontak-darurat" },
+      { label: "Privasi & Data", href: "/privasi" },
+    ],
     [],
   );
 
@@ -277,8 +281,8 @@ export default function TentangPage() {
           </p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link} className={styles.footerLinkWrap}>
-                <Link href="#" className={styles.footerLink}>{link}</Link>
+              <span key={link.href} className={styles.footerLinkWrap}>
+                <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && (
                   <span className={styles.footerDot}>•</span>
                 )}
