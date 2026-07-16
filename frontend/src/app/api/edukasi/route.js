@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET() {
   const supabase = await createClient()
@@ -39,10 +40,29 @@ export async function POST(request) {
   })
 
   if (selesai && modul?.poin_reward) {
-    await supabase.rpc('tambah_poin', {
+    // Pemberian poin lewat service_role, BUKAN sesi pengguna.
+    //
+    // Migrasi 003 mencabut EXECUTE tambah_poin dari `authenticated`, karena
+    // fungsi itu SECURITY DEFINER: siapa pun yang bisa memanggilnya bisa
+    // menaikkan poin akun mana pun sebanyak apa pun. Mengembalikan grant itu
+    // demi route ini akan membuka kembali lubangnya.
+    //
+    // Jumlah poinnya ditentukan server dari modul (poin_reward), dan hanya
+    // diberikan ke user.id si pemanggil — keduanya tidak bisa disetir klien.
+    const admin = createAdminClient()
+    const { error: errPoin } = await admin.rpc('tambah_poin', {
       p_user_id: user.id,
       p_poin: modul.poin_reward,
     })
+    // Sebelumnya error rpc tidak pernah diperiksa, jadi kegagalannya senyap:
+    // route tetap membalas success walau poinnya tidak pernah masuk.
+    if (errPoin) {
+      console.error('tambah_poin gagal:', errPoin.message)
+      return NextResponse.json(
+        { success: true, poin_diberikan: false, catatan: 'Progres tersimpan, poin gagal ditambahkan.' },
+        { status: 200 }
+      )
+    }
   }
 
   return NextResponse.json({ success: true })

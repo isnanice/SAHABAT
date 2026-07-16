@@ -1,45 +1,81 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { sendChatbotMessage } from '@/lib/ai/chatbot'
+import { deteksiKrisisRiwayat } from '@/lib/keamanan/crisis'
+import { cekRateLimit, LIMIT } from '@/lib/keamanan/ratelimit'
+import { HOTLINE } from '@/lib/keamanan/hotline'
 
+/**
+ * POST /api/ai/chatbot
+ *
+ * URUTAN DI BAWAH DISENGAJA DAN TIDAK BOLEH DIUBAH:
+ *
+ *   1. rate limit
+ *   2. deteksi krisis  <-- deterministik, tanpa network
+ *   3. LLM
+ *
+ * Deteksi krisis harus mendahului LLM supaya anak yang menulis indikasi
+ * bunuh diri tidak perlu menunggu — dan tetap tertangani JUSTRU ketika
+ * gateway AI sedang mati. Kalau kamu tergoda memindahkan deteksi krisis ke
+ * belakang LLM (misalnya "biar AI yang menilai konteksnya"), jangan:
+ * saat itulah lapisan ini paling dibutuhkan dan paling mungkin ikut mati.
+ *
+ * Balasan selalu punya field `mode`:
+ *   'krisis'   -> frontend WAJIB menghentikan input & menampilkan panel darurat
+ *   'gangguan' -> AI down, tampilkan `balasan` apa adanya
+ *   'normal'   -> balasan biasa
+ */
 export async function POST(request) {
-  try {
-    const { messages, sessionId } = await request.json()
+  const sesi = request.headers.get('x-sesi') || ''
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Format pesan tidak valid' }, { status: 400 })
-    }
-
-    // Batasi riwayat pesan ke 20 terakhir untuk efisiensi
-    const recentMessages = messages.slice(-20)
-
-    const responseText = await sendChatbotMessage(recentMessages)
-
-    // Simpan ke database (opsional, bisa dinonaktifkan untuk privasi penuh)
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (user && sessionId) {
-      // Simpan pesan user dan assistant ke riwayat
-      const lastUserMsg = messages[messages.length - 1]
-      await supabase.from('chatbot_sessions').upsert({
-        id: sessionId,
-        user_id: user.id,
-        updated_at: new Date().toISOString(),
-      })
-
-      await supabase.from('chatbot_messages').insert([
-        { session_id: sessionId, role: lastUserMsg.role, content: lastUserMsg.content },
-        { session_id: sessionId, role: 'assistant', content: responseText },
-      ])
-    }
-
-    return NextResponse.json({ message: responseText })
-  } catch (error) {
-    console.error('Chatbot API error:', error)
+  // --- 1. Rate limit -------------------------------------------------------
+  const batas = await cekRateLimit(sesi, 'chat', LIMIT.CHAT)
+  if (!batas.ok) {
     return NextResponse.json(
-      { error: 'Terjadi kesalahan pada layanan AI' },
-      { status: 500 }
+      {
+        mode: 'gangguan',
+        balasan: 'Terlalu banyak pesan dalam waktu singkat. Coba lagi beberapa menit lagi.',
+      },
+      { status: 429, headers: { 'Retry-After': String(batas.retryAfterDetik) } }
     )
   }
+
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Body tidak valid' }, { status: 400 })
+  }
+
+  const { messages } = body || {}
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return NextResponse.json({ error: 'Format pesan tidak valid' }, { status: 400 })
+  }
+
+  // --- 2. Deteksi krisis — SEBELUM LLM ------------------------------------
+  // Seluruh riwayat diperiksa, bukan cuma pesan terakhir: anak bisa menyebut
+  // indikasi krisis di awal lalu melanjutkan cerita biasa.
+  const krisis = deteksiKrisisRiwayat(messages)
+  if (krisis.krisis) {
+    // LLM SENGAJA TIDAK DIPANGGIL di turn ini (uji spec §8.3 memeriksa ini).
+    return NextResponse.json({
+      mode: 'krisis',
+      kategori: krisis.kategori,
+      balasan:
+        'Aku berhenti sebentar, karena yang kamu tulis terdengar berat dan ' +
+        'kamu berhak dapat bantuan dari manusia — bukan dari bot.\n\n' +
+        'Kalau kamu sedang dalam bahaya sekarang, tolong temui Guru BK, orang ' +
+        'tua, atau orang dewasa yang kamu percaya secepatnya. Kamu tidak harus ' +
+        'menghadapi ini sendirian, dan bercerita tadi bukan hal yang memalukan.',
+      hotline: HOTLINE,
+    })
+  }
+
+  // --- 3. LLM --------------------------------------------------------------
+  // Riwayat chat TIDAK disimpan ke DB. Versi sebelumnya menyimpannya ke
+  // chatbot_messages saat user login — untuk sesi yang seharusnya anonim,
+  // itu menciptakan tautan permanen antara identitas siswa dan ceritanya.
+  // Transkrip hanya ikut tersimpan kalau siswa SENDIRI memilih
+  // "Jadikan Laporan" (dikirim eksplisit ke /api/laporan).
+  const hasil = await sendChatbotMessage(messages)
+  return NextResponse.json(hasil)
 }
