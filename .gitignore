@@ -1,23 +1,64 @@
+# ============================================================
+# RAHASIA — jangan pernah di-commit
+# ============================================================
+# Isinya SUPABASE_SERVICE_ROLE_KEY (melewati seluruh RLS),
+# LLM_GATEWAY_KEY, dan TICKET_PEPPER (kunci hash kode tiket —
+# bocornya berarti setiap tiket siswa bisa dilacak).
+.env
+.env.*
+!.env.example
+
+# Kunci/sertifikat yang tidak sengaja tertaruh di repo
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*.jks
+
+# Dump/backup database — berisi cerita anak tentang kekerasan.
+# Bocornya satu berkas ini lebih parah daripada bocornya kode.
+*.sql.gz
+*.dump
+*.bak
+backup*/
+dump*/
+
+# Arsip mentah (mis. LIDM.zip, sahabat-backend.zip) — sering berisi
+# ekspor atau kredensial yang tidak sempat diperiksa isinya.
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# ============================================================
+# Build & dependensi
+# ============================================================
 node_modules
 .next
 out
 build
 dist
-
-.env
-.env.*
-!.env.example
-
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-*.log
-
-.DS_Store
-
-.vercel
-
+coverage
 *.tsbuildinfo
 next-env.d.ts
 
-coverage
+# ============================================================
+# Log — bisa memuat isi laporan atau kode tiket dari console.error
+# ============================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ============================================================
+# Tooling & OS
+# ============================================================
+.vercel
+.supabase
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
