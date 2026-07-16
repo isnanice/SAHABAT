@@ -1,6 +1,5 @@
 import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { v4 as uuidv4 } from 'uuid'
 
 /**
  * Merge Tailwind CSS classes dengan clsx
@@ -10,15 +9,13 @@ export function cn(...inputs) {
 }
 
 /**
- * Generate kode tiket unik untuk laporan anonim
- * Format: SAH-XXXX-XXXX (huruf + angka)
+ * generateKodeTiket() dipindah ke `@/lib/keamanan/tiket`.
+ *
+ * Versi lama di sini memakai Math.random(), yang tidak aman untuk kredensial:
+ * kode tiket adalah satu-satunya cara siswa anonim memantau laporannya, dan
+ * keluaran Math.random() bisa diprediksi dari beberapa sampel. Jangan
+ * membangkitkan kode tiket dari file ini.
  */
-export function generateKodeTiket() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  const segment = (len) =>
-    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-  return `SAH-${segment(4)}-${segment(4)}`
-}
 
 /**
  * Format tanggal ke bahasa Indonesia
