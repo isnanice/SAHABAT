@@ -93,3 +93,95 @@ export async function panggilLLM({ system, messages, maxTokens = MAX_TOKENS }) {
 
   return { ok: true, teks }
 }
+
+/**
+ * Versi streaming. Memanggil `onToken(potongan)` untuk setiap potongan
+ * JAWABAN (content) yang tiba — BUKAN reasoning_content.
+ *
+ * Kenapa reasoning tidak diteruskan: isinya penalaran model atas cerita anak
+ * (tidak boleh bocor ke layar), dan model ini streaming ~116 chunk reasoning
+ * DULU sebelum jawaban pertama. Selama fase itu onToken tidak dipanggil —
+ * UI menampilkan "sedang mengetik". Begitu content mulai, kata-kata mengalir.
+ *
+ * TIDAK PERNAH throw. Mengembalikan hasil akhir yang sama bentuknya dengan
+ * panggilLLM, plus menandai apakah ada teks yang sempat ter-stream — supaya
+ * pemanggil bisa fail-safe kalau ternyata kosong (mis. anggaran habis untuk
+ * reasoning, persis jebakan yang sama di versi non-streaming).
+ *
+ * @returns {Promise<{ok:true, teks:string} | {ok:false, alasan:string}>}
+ */
+export async function panggilLLMStream({ system, messages, maxTokens = MAX_TOKENS }, onToken) {
+  const url = process.env.LLM_GATEWAY_URL || DEFAULT_URL
+  const key = process.env.LLM_GATEWAY_KEY
+
+  if (!key) return { ok: false, alasan: 'LLM_GATEWAY_KEY belum diset' }
+
+  let res
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: modelAktif(),
+        max_tokens: maxTokens,
+        stream: true,
+        messages: system ? [{ role: 'system', content: system }, ...messages] : messages,
+      }),
+    })
+  } catch (e) {
+    return { ok: false, alasan: e?.name === 'TimeoutError' ? 'timeout' : 'jaringan' }
+  }
+
+  if (!res.ok || !res.body) return { ok: false, alasan: `HTTP ${res.status}` }
+
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let teks = ''
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+
+      // Server-Sent Events: baris "data: {...}", dipisah newline.
+      const baris = buffer.split('\n')
+      buffer = baris.pop() // sisa yang belum lengkap, simpan untuk iterasi berikut
+
+      for (const b of baris) {
+        const t = b.trim()
+        if (!t.startsWith('data:')) continue
+        const payload = t.slice(5).trim()
+        if (payload === '[DONE]') continue
+        let json
+        try {
+          json = JSON.parse(payload)
+        } catch {
+          continue // chunk tidak lengkap/rusak — lewati, jangan jatuhkan seluruh stream
+        }
+        // HANYA content yang diteruskan. reasoning_content diabaikan.
+        const potongan = json?.choices?.[0]?.delta?.content
+        if (potongan) {
+          teks += potongan
+          onToken?.(potongan)
+        }
+      }
+    }
+  } catch {
+    // Stream putus di tengah. Kalau sudah ada teks, itu tetap balasan yang sah
+    // — kembalikan apa adanya. Kalau kosong, perlakukan sebagai gagal.
+    if (teks.trim()) return { ok: true, teks }
+    return { ok: false, alasan: 'stream putus' }
+  }
+
+  // Anggaran habis untuk reasoning -> content tidak pernah datang. Jebakan yang
+  // sama dengan versi non-streaming, ditangani sama: gagal, bukan balasan kosong.
+  if (!teks.trim()) return { ok: false, alasan: 'respons kosong (reasoning menghabiskan anggaran)' }
+
+  return { ok: true, teks }
+}

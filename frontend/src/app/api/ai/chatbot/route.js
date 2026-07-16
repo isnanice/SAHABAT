@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { sendChatbotMessage } from '@/lib/ai/chatbot'
+import { streamChatbotMessage, FALLBACK_GANGGUAN } from '@/lib/ai/chatbot'
 import { deteksiKrisisRiwayat } from '@/lib/keamanan/crisis'
 import { cekRateLimit, LIMIT } from '@/lib/keamanan/ratelimit'
 import { HOTLINE } from '@/lib/keamanan/hotline'
@@ -19,10 +19,17 @@ import { HOTLINE } from '@/lib/keamanan/hotline'
  * belakang LLM (misalnya "biar AI yang menilai konteksnya"), jangan:
  * saat itulah lapisan ini paling dibutuhkan dan paling mungkin ikut mati.
  *
- * Balasan selalu punya field `mode`:
- *   'krisis'   -> frontend WAJIB menghentikan input & menampilkan panel darurat
- *   'gangguan' -> AI down, tampilkan `balasan` apa adanya
- *   'normal'   -> balasan biasa
+ * BENTUK RESPONS:
+ *   - krisis / gangguan / rate limit -> JSON biasa dengan field `mode`.
+ *     (Krisis TIDAK di-stream: panel darurat harus muncul utuh & instan.)
+ *   - normal -> STREAM baris-per-baris (NDJSON). Baris pertama {mode:'normal'},
+ *     lalu {t:'...'} per potongan jawaban, ditutup {selesai:true}. Kalau di
+ *     tengah stream AI ternyata gagal tanpa satu token pun, baris {mode:
+ *     'gangguan'} dikirim supaya frontend menampilkan pesan jujur.
+ *
+ * Streaming hanya mengubah CARA balasan normal dikirim — urutan
+ * rate limit -> krisis -> LLM tetap persis sama, dan krisis tetap tidak
+ * pernah menyentuh LLM.
  */
 export async function POST(request) {
   const sesi = request.headers.get('x-sesi') || ''
@@ -70,12 +77,47 @@ export async function POST(request) {
     })
   }
 
-  // --- 3. LLM --------------------------------------------------------------
-  // Riwayat chat TIDAK disimpan ke DB. Versi sebelumnya menyimpannya ke
-  // chatbot_messages saat user login — untuk sesi yang seharusnya anonim,
-  // itu menciptakan tautan permanen antara identitas siswa dan ceritanya.
-  // Transkrip hanya ikut tersimpan kalau siswa SENDIRI memilih
-  // "Jadikan Laporan" (dikirim eksplisit ke /api/laporan).
-  const hasil = await sendChatbotMessage(messages)
-  return NextResponse.json(hasil)
+  // --- 3. LLM (streaming) --------------------------------------------------
+  // Riwayat chat TIDAK disimpan ke DB (lihat catatan anonimitas di bawah).
+  //
+  // Sampai titik ini kita SUDAH tahu ini bukan krisis dan tidak kena rate
+  // limit. Baru sekarang stream dibuka.
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream({
+    async start(controller) {
+      const kirim = (obj) => controller.enqueue(encoder.encode(JSON.stringify(obj) + '\n'))
+
+      // Baris pertama: beri tahu frontend ini balasan normal, sebelum token
+      // apa pun. Frontend bisa langsung menyiapkan gelembung kosong.
+      kirim({ mode: 'normal' })
+
+      let adaToken = false
+      const hasil = await streamChatbotMessage(messages, (potongan) => {
+        adaToken = true
+        kirim({ t: potongan })
+      })
+
+      // Kalau AI gagal tanpa menghasilkan satu token pun, ganti jadi pesan
+      // gangguan yang jujur — jangan tinggalkan gelembung kosong.
+      if (!hasil.ok && !adaToken) {
+        kirim({ mode: 'gangguan', balasan: FALLBACK_GANGGUAN })
+      }
+
+      kirim({ selesai: true })
+      controller.close()
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'application/x-ndjson; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Accel-Buffering': 'no', // cegah proxy menahan stream sampai selesai
+    },
+  })
 }
+
+// Riwayat chat TIDAK disimpan ke DB. Versi sebelumnya menyimpannya ke
+// chatbot_messages saat user login — untuk sesi yang seharusnya anonim, itu
+// menciptakan tautan permanen antara identitas siswa dan ceritanya. Transkrip
+// hanya ikut tersimpan kalau siswa SENDIRI memilih "Jadikan Laporan".

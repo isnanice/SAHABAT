@@ -10,6 +10,27 @@ import KodeTiket from '@/components/KodeTiket'
 import { api, ApiError, SEKOLAH_ID } from '@/lib/api'
 
 /**
+ * Indikator "sedang menyusun jawaban".
+ *
+ * Tiga titik memantul + teks menenangkan. Ditampilkan selama ~3-4 detik saat
+ * model berpikir (reasoning disembunyikan). Tidak mempercepat apa pun —
+ * tugasnya cuma membuat tunggu terasa disengaja dan tenang, bukan rusak.
+ * Teksnya jujur: jawabannya memang sedang disusun.
+ */
+function IndikatorMengetik() {
+  return (
+    <div className="flex items-center gap-2" aria-label="Sedang menyusun jawaban">
+      <span className="flex gap-1" aria-hidden="true">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-sahabat [animation-delay:-0.3s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-sahabat [animation-delay:-0.15s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-sahabat" />
+      </span>
+      <span className="text-xs text-gray-500">Sedang menyusun jawaban…</span>
+    </div>
+  )
+}
+
+/**
  * RuangAman (spec §4.1B).
  *
  * Perilaku yang tidak boleh dikompromikan: begitu `mode === 'krisis'`, input
@@ -156,24 +177,34 @@ export default function RuangAmanPage() {
                       : 'bg-sahabat-muda text-gray-900'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {m.content}
-                  </p>
+                  {/* Gelembung asisten yang masih kosong = jawaban sedang
+                      disusun (reasoning jalan di gateway, ~3-4 detik, sengaja
+                      disembunyikan). Tampilkan indikator hangat, bukan gelembung
+                      kosong: anak yang cemas butuh tanda bahwa dia didengar,
+                      bukan layar diam yang terasa rusak. */}
+                  {m.role === 'assistant' && m.content === '' ? (
+                    <IndikatorMengetik />
+                  ) : (
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {m.content}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
 
-            {loading && (
-              <div className="flex justify-start">
-                <div className="rounded-2xl bg-sahabat-muda px-4 py-3">
-                  <Loader2
-                    size={16}
-                    className="animate-spin text-sahabat"
-                    aria-label="Sedang mengetik"
-                  />
+            {/* Spinner mandiri HANYA untuk jeda sebelum gelembung asisten ada
+                (jalur non-stream: krisis/gangguan). Saat streaming, gelembungnya
+                sudah muncul dan menampilkan IndikatorMengetik sendiri, jadi ini
+                tidak dobel. */}
+            {loading &&
+              messages[messages.length - 1]?.role === 'user' && (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl bg-sahabat-muda px-4 py-3">
+                    <IndikatorMengetik />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             <div ref={bawah} />
           </div>

@@ -68,53 +68,112 @@ const useChatbotStore = create((set, get) => ({
 
     set({ messages: riwayat, loading: true })
 
-    let data
+    const GANGGUAN_KONEKSI =
+      'Koneksinya bermasalah jadi aku belum bisa membalas. Kamu tetap bisa ' +
+      'mengirim laporan lewat tombol "Lapor Sekarang", dan laporanmu akan ' +
+      'tetap sampai ke Guru BK.'
+
+    let response
     try {
-      const response = await fetch('/api/ai/chatbot', {
+      response = await fetch('/api/ai/chatbot', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-sesi': ambilSesi(),
-        },
+        headers: { 'Content-Type': 'application/json', 'x-sesi': ambilSesi() },
         body: JSON.stringify({
           messages: riwayat.map((m) => ({ role: m.role, content: m.content })),
         }),
       })
-      data = await response.json()
     } catch {
       set((s) => ({
         loading: false,
         mode: 'gangguan',
-        messages: [
-          ...s.messages,
-          {
-            id: `${Date.now() + 1}`,
-            role: 'assistant',
-            content:
-              'Koneksinya bermasalah jadi aku belum bisa membalas. Kamu tetap bisa ' +
-              'mengirim laporan lewat tombol "Lapor Sekarang", dan laporanmu akan ' +
-              'tetap sampai ke Guru BK.',
-          },
-        ],
+        messages: [...s.messages, { id: `${Date.now() + 1}`, role: 'assistant', content: GANGGUAN_KONEKSI }],
       }))
       return
     }
 
-    const mode = data?.mode || 'normal'
-    const balasan = data?.balasan || data?.error || 'Maaf, terjadi gangguan.'
+    const ct = response.headers.get('content-type') || ''
+
+    // --- Respons JSON: krisis, gangguan, atau rate limit (tidak di-stream) ---
+    // Panel darurat harus muncul utuh dan instan, jadi krisis sengaja BUKAN
+    // stream. Cabang ini menangani persis seperti sebelum streaming ada.
+    if (!ct.includes('x-ndjson')) {
+      let data = {}
+      try {
+        data = await response.json()
+      } catch {}
+      const mode = data?.mode || 'gangguan'
+      const balasan = data?.balasan || data?.error || 'Maaf, terjadi gangguan.'
+      set((s) => ({
+        loading: false,
+        mode,
+        hotline: Array.isArray(data?.hotline) ? data.hotline : [],
+        messages: [...s.messages, { id: `${Date.now() + 1}`, role: 'assistant', content: balasan }],
+      }))
+      return
+    }
+
+    // --- Respons stream (NDJSON): balasan normal, kata-per-kata ---
+    const idBalasan = `${Date.now() + 1}`
+    // Gelembung kosong dibuat lebih dulu; token mengalir masuk ke sini.
+    set((s) => ({
+      messages: [...s.messages, { id: idBalasan, role: 'assistant', content: '' }],
+    }))
+
+    const tambah = (potongan) =>
+      set((s) => ({
+        messages: s.messages.map((m) =>
+          m.id === idBalasan ? { ...m, content: m.content + potongan } : m
+        ),
+      }))
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    let gangguan = false
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const baris = buffer.split('\n')
+        buffer = baris.pop()
+        for (const b of baris) {
+          if (!b.trim()) continue
+          let obj
+          try {
+            obj = JSON.parse(b)
+          } catch {
+            continue
+          }
+          if (obj.t) tambah(obj.t)
+          if (obj.mode === 'gangguan') {
+            gangguan = true
+            set((s) => ({
+              mode: 'gangguan',
+              messages: s.messages.map((m) =>
+                m.id === idBalasan ? { ...m, content: obj.balasan } : m
+              ),
+            }))
+          }
+        }
+      }
+    } catch {
+      // Stream putus. Kalau belum ada teks sama sekali, isi gelembungnya
+      // dengan pesan jujur — jangan tinggalkan kosong.
+      set((s) => ({
+        messages: s.messages.map((m) =>
+          m.id === idBalasan && !m.content ? { ...m, content: GANGGUAN_KONEKSI } : m
+        ),
+      }))
+      gangguan = true
+    }
 
     set((s) => ({
       loading: false,
-      mode,
-      hotline: Array.isArray(data?.hotline) ? data.hotline : [],
-      messages: [
-        ...s.messages,
-        { id: `${Date.now() + 1}`, role: 'assistant', content: balasan },
-      ],
-      // Krisis membatalkan alur pelaporan biasa — panel darurat yang
-      // menyediakan tombolnya sendiri ("Buat Laporan Prioritas").
+      mode: gangguan ? 'gangguan' : 'normal',
       bisaJadikanLaporan:
-        mode === 'normal' && s.messages.filter((m) => m.role === 'user').length >= 2,
+        !gangguan && s.messages.filter((m) => m.role === 'user').length >= 2,
     }))
   },
 

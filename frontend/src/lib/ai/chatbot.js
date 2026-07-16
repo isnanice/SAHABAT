@@ -17,7 +17,7 @@
  * supaya lapisan keselamatan tidak ikut mati saat gateway AI mati.
  */
 
-import { panggilLLM } from './gateway'
+import { panggilLLM, panggilLLMStream } from './gateway'
 
 const MAX_TURN = 20
 
@@ -86,3 +86,34 @@ export async function sendChatbotMessage(messages) {
 
   return { mode: 'normal', balasan: hasil.teks }
 }
+
+/**
+ * Versi streaming dari sendChatbotMessage.
+ *
+ * Deteksi krisis TIDAK di sini — route yang menjalankannya lebih dulu, dan
+ * hanya memanggil fungsi ini kalau BUKAN krisis. Jadi jalur streaming tidak
+ * pernah menyentuh anak yang sedang dalam krisis; dia dapat panel darurat
+ * tanpa menunggu satu token pun.
+ *
+ * @param onToken dipanggil per potongan jawaban yang tiba
+ * @returns {Promise<{ok:boolean, gangguan?:boolean}>}
+ */
+export async function streamChatbotMessage(messages, onToken) {
+  const riwayat = (Array.isArray(messages) ? messages : [])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && m.content)
+    .slice(-MAX_TURN)
+    .map((m) => ({ role: m.role, content: String(m.content).slice(0, 4000) }))
+
+  if (riwayat.length === 0) return { ok: false, gangguan: true }
+
+  const hasil = await panggilLLMStream(
+    { system: SYSTEM_PROMPT, messages: riwayat },
+    onToken
+  )
+
+  // Gagal (gateway mati/timeout/kosong) -> beri sinyal gangguan supaya route
+  // bisa mengirim pesan fallback yang jujur, bukan membiarkan layar kosong.
+  return { ok: hasil.ok, gangguan: !hasil.ok }
+}
+
+export { FALLBACK_GANGGUAN }
