@@ -1,21 +1,97 @@
 "use client";
 
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import styles from "../auth.module.css";
 
-export default function Login() {
+/**
+ * Login staf sekolah.
+ *
+ * Versi sebelumnya form statis — tanpa state, tanpa onSubmit, tanpa panggilan
+ * Supabase. Tombolnya ada tapi tidak melakukan apa pun, jadi dashboard Guru BK
+ * tidak pernah bisa dijangkau siapa pun.
+ *
+ * Halaman ini HANYA untuk staf. Siswa tidak login sama sekali — mereka
+ * melapor lewat /lapor dan memantau lewat /cek-laporan dengan kode tiket.
+ */
+function FormLogin() {
+  const router = useRouter();
+  const params = useSearchParams();
+
+  const [email, setEmail] = useState("");
+  const [sandi, setSandi] = useState("");
+  const [lihatSandi, setLihatSandi] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function masuk(e) {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+    setError("");
+
+    const supabase = createClient();
+    const { data, error: errAuth } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: sandi,
+    });
+
+    if (errAuth) {
+      // Pesan sengaja tidak membedakan "email tidak ada" dari "sandi salah".
+      // Membedakannya memberi tahu penyerang email mana yang terdaftar sebagai
+      // staf — daftar target untuk phishing akun yang memegang cerita anak.
+      setError("Email atau kata sandi salah.");
+      setLoading(false);
+      return;
+    }
+
+    const { data: profil } = await supabase
+      .from("profiles")
+      .select("role, aktif")
+      .eq("id", data.user.id)
+      .single();
+
+    if (!profil?.aktif) {
+      await supabase.auth.signOut();
+      setError("Akunmu tidak aktif. Hubungi admin sekolah.");
+      setLoading(false);
+      return;
+    }
+
+    const tujuan = {
+      GURU_BK: "/guru-bk/inbox",
+      KEPALA_SEKOLAH: "/kepala-sekolah/analitik",
+    }[profil.role];
+
+    if (!tujuan) {
+      // Akun siswa tidak punya dashboard — jalur siswa memang tanpa login.
+      await supabase.auth.signOut();
+      setError(
+        "Akun ini bukan akun staf. Siswa tidak perlu login — langsung pakai tombol “Lapor Sekarang” di halaman depan."
+      );
+      setLoading(false);
+      return;
+    }
+
+    router.push(params.get("redirect") || tujuan);
+    router.refresh();
+  }
+
   return (
     <div className={styles.card}>
       <div className={styles.logoWrap}>
-        <Image src="/logo.png" alt="SAHABAT Logo" width={32} height={32} />
-        <span style={{color: '#1e40af', fontWeight: 'bold', fontSize: '18px'}}>SAHABAT</span>
+        <Image src="/logo.png" alt="SAHABAT Logo" width={32} height={32} style={{ height: "auto" }} />
+        <span style={{ color: "#1e40af", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
       </div>
 
       <h2 className={styles.cardTitle}>Masuk ke Akun</h2>
       <p className={styles.cardSubtitle}>
-        Masuk untuk mengakses layanan konseling bersama Guru BK secara aman dan rahasia.
+        Halaman ini untuk Guru BK dan pihak sekolah. Kalau kamu siswa dan ingin
+        melapor, <Link href="/lapor">kamu tidak perlu login</Link>.
       </p>
 
       <div className={styles.tabs}>
@@ -23,36 +99,90 @@ export default function Login() {
         <Link href="/register" className={styles.tab}>Daftar</Link>
       </div>
 
-      <form>
+      <form onSubmit={masuk}>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Alamat Email</label>
-          <input type="email" className={styles.input} placeholder="contoh@gmail.com" />
+          <label className={styles.label} htmlFor="email">Alamat Email</label>
+          <input
+            id="email"
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={styles.input}
+            placeholder="nama@sekolah.sch.id"
+          />
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Kata Sandi</label>
+          <label className={styles.label} htmlFor="sandi">Kata Sandi</label>
           <div className={styles.passwordWrap}>
-            <input type="password" className={styles.input} placeholder="Minimal 8 karakter" />
-            <Eye size={20} className={styles.eyeIcon} />
+            <input
+              id="sandi"
+              type={lihatSandi ? "text" : "password"}
+              required
+              autoComplete="current-password"
+              value={sandi}
+              onChange={(e) => setSandi(e.target.value)}
+              className={styles.input}
+              placeholder="Kata sandi"
+            />
+            <button
+              type="button"
+              onClick={() => setLihatSandi((v) => !v)}
+              className={styles.eyeIcon}
+              style={{ background: "none", border: "none", cursor: "pointer" }}
+              aria-label={lihatSandi ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+            >
+              {lihatSandi ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
         </div>
 
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
-          <div className={styles.checkboxWrap} style={{marginTop: 0, marginBottom: 0}}>
-            <input type="checkbox" id="remember" className={styles.checkbox} />
-            <label htmlFor="remember" className={styles.checkboxLabel}>Ingat saya</label>
-          </div>
-          <Link href="/forgot-password" className={styles.forgotLink} style={{margin: 0}}>Lupa Sandi?</Link>
+        {error && (
+          <p role="alert" style={{ color: "#dc2626", fontSize: 14, marginBottom: 16 }}>
+            {error}
+          </p>
+        )}
+
+        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "24px" }}>
+          <Link href="/forgot-password" className={styles.forgotLink} style={{ margin: 0 }}>
+            Lupa Sandi?
+          </Link>
         </div>
 
-        <button type="submit" className={styles.submitBtn}>
-          Masuk <ArrowRight size={20} />
+        <button type="submit" className={styles.submitBtn} disabled={loading}>
+          {loading ? (
+            <>
+              Memproses <Loader2 size={20} className="animate-spin" />
+            </>
+          ) : (
+            <>
+              Masuk <ArrowRight size={20} />
+            </>
+          )}
         </button>
-
-        <p className={styles.footerText} style={{marginTop: '40px'}}>
-          Belum punya akun? <Link href="/register">Daftar di sini</Link>
-        </p>
       </form>
     </div>
+  );
+}
+
+/**
+ * useSearchParams() memaksa client-side rendering, dan Next.js menolak
+ * mem-prerender halaman yang memakainya tanpa batas Suspense. Tanpa wrapper
+ * ini `npm run build` gagal di tahap prerender /login — build lokal lolos,
+ * deploy yang jebol.
+ */
+export default function Login() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.card}>
+          <p className={styles.cardSubtitle}>Memuat…</p>
+        </div>
+      }
+    >
+      <FormLogin />
+    </Suspense>
   );
 }
