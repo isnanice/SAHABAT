@@ -4,6 +4,22 @@ import { NextResponse } from 'next/server'
 export async function updateSession(request) {
   let supabaseResponse = NextResponse.next({ request })
 
+  // Tanpa env, createServerClient melempar dan seluruh route yang cocok jadi
+  // 404 — bukan pesan error yang bisa dipahami. Fail closed: kalau auth tidak
+  // bisa dievaluasi, jangan biarkan route terproteksi terbuka; lempar ke login.
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    console.error(
+      'middleware: NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY belum diset — ' +
+        'route terproteksi dialihkan ke /login. Isi frontend/.env.local.'
+    )
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -50,14 +66,19 @@ export async function updateSession(request) {
       .eq('id', user.id)
       .single()
 
+    // Tujuan harus halaman yang BENAR-BENAR ADA.
+    // Versi sebelumnya mengarah ke '/siswa', '/guru-bk', '/kepala-sekolah' —
+    // ketiganya cuma route group tanpa halaman index, jadi setiap login yang
+    // berhasil berakhir di 404. Login "berfungsi" tapi tidak ada yang sampai.
     const roleRedirect = {
-      SISWA: '/siswa',
-      GURU_BK: '/guru-bk',
-      KEPALA_SEKOLAH: '/kepala-sekolah',
+      GURU_BK: '/guru-bk/inbox',
+      KEPALA_SEKOLAH: '/kepala-sekolah/analitik',
     }
 
     const url = request.nextUrl.clone()
-    url.pathname = roleRedirect[profile?.role] || '/siswa'
+    // Siswa tidak punya dashboard — jalur siswa memang tanpa login.
+    // Kalau akun siswa entah bagaimana login, pulangkan ke beranda.
+    url.pathname = roleRedirect[profile?.role] || '/'
     return NextResponse.redirect(url)
   }
 
