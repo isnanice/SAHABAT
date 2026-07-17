@@ -6,6 +6,7 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import { Search, X, ArrowLeft, BookOpen } from "lucide-react";
 import HeaderPublic from "@/components/HeaderPublic";
+import { ARTIKEL_EDUKASI } from "@/lib/edukasi/data";
 
 const articles = [
   {

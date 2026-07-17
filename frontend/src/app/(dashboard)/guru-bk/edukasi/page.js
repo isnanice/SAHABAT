@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from 'react'
-import { Upload, ChevronDown, Edit2, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Link as LinkIcon, Heading, X, Image as ImageIcon } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Upload, ChevronDown, Edit2, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Link as LinkIcon, X, Image as ImageIcon } from 'lucide-react'
+import { ARTIKEL_EDUKASI } from '@/lib/edukasi/data'
 
 const KATEGORI_WARNA = {
   'Cyberbullying': 'bg-orange-100 text-orange-800',
@@ -10,18 +11,12 @@ const KATEGORI_WARNA = {
   'Manajemen Emosi': 'bg-purple-100 text-purple-800',
 }
 
-const ARTIKEL_AWAL = [
-  { id: 1, judul: 'Mengenal Cyberbullying', kategori: 'Cyberbullying', sasaran: 'Semua Siswa', isi: '<p>Pahami bentuk, dampak, dan cara menghadapi cyberbullying agar tetap aman dan percaya diri di ruang digital.</p>', thumbnail: null, tayangan: 3204, selesai: 85 },
-  { id: 2, judul: 'Pentingnya Kesehatan Mental Remaja', kategori: 'Kesehatan Mental', sasaran: 'Kelas 10', isi: '<p>Kenali pentingnya menjaga kesehatan mental sejak dini untuk mendukung tumbuh kembang remaja.</p>', thumbnail: null, tayangan: 1842, selesai: 62 },
-  { id: 3, judul: 'Cara Mendukung Teman yang Kesulitan', kategori: 'Dukungan Sosial', sasaran: 'Semua Siswa', isi: '<p>Menjadi pendengar yang baik dan memberikan dukungan emosional dapat membantu teman melewati masa sulit.</p>', thumbnail: null, tayangan: 890, selesai: 45 },
-]
-
-function ToolbarBtn({ onClick, active, title, children }) {
+function ToolbarBtn({ onClick, title, children }) {
   return (
     <button
       type="button"
       onMouseDown={(e) => { e.preventDefault(); onClick(); }}
-      className={`p-1.5 rounded transition text-sm ${active ? 'bg-[#3525CD] text-white' : 'text-gray-600 hover:bg-gray-200'}`}
+      className="p-1.5 rounded transition text-gray-600 hover:bg-gray-200"
       title={title}
     >
       {children}
@@ -30,16 +25,28 @@ function ToolbarBtn({ onClick, active, title, children }) {
 }
 
 export default function EdukasiPage() {
-  const [artikel, setArtikel] = useState(ARTIKEL_AWAL)
-  const [editId, setEditId] = useState(null) // null = baru, number = edit
+  // State artikel — diinisialisasi dari data bersama
+  const [artikel, setArtikel] = useState(() => ARTIKEL_EDUKASI.map(a => ({ ...a })))
+  const [editId, setEditId] = useState(null)
+
+  // Form fields
   const [judul, setJudul] = useState('')
   const [kategori, setKategori] = useState('Cyberbullying')
   const [sasaran, setSasaran] = useState('Semua Siswa')
   const [deadline, setDeadline] = useState('')
-  const [thumbnail, setThumbnail] = useState(null) // base64
-  const [thumbnailName, setThumbnailName] = useState('')
+  const [thumbnail, setThumbnail] = useState(null)
+  const [pendingIsi, setPendingIsi] = useState(null) // HTML string untuk dimasukkan ke editor
+
   const editorRef = useRef(null)
   const fileInputRef = useRef(null)
+
+  // Ketika pendingIsi berubah (setelah startEdit di-set), masukkan ke editor
+  useEffect(() => {
+    if (pendingIsi !== null && editorRef.current) {
+      editorRef.current.innerHTML = pendingIsi
+      setPendingIsi(null)
+    }
+  }, [pendingIsi])
 
   const exec = useCallback((cmd, val = null) => {
     editorRef.current?.focus()
@@ -48,7 +55,6 @@ export default function EdukasiPage() {
 
   const handleThumbnail = (file) => {
     if (!file) return
-    setThumbnailName(file.name)
     const reader = new FileReader()
     reader.onload = (e) => setThumbnail(e.target.result)
     reader.readAsDataURL(file)
@@ -61,8 +67,7 @@ export default function EdukasiPage() {
     setSasaran('Semua Siswa')
     setDeadline('')
     setThumbnail(null)
-    setThumbnailName('')
-    if (editorRef.current) editorRef.current.innerHTML = ''
+    setPendingIsi('')
   }
 
   const startEdit = (item) => {
@@ -70,10 +75,9 @@ export default function EdukasiPage() {
     setJudul(item.judul)
     setKategori(item.kategori)
     setSasaran(item.sasaran)
-    setThumbnail(item.thumbnail)
-    setThumbnailName('')
-    if (editorRef.current) editorRef.current.innerHTML = item.isi || ''
-    // scroll to form
+    setThumbnail(item.imagePath || item.thumbnail || null)
+    // Masukkan isi artikel penuh ke editor via useEffect
+    setPendingIsi(item.isi || '')
     document.getElementById('form-edukasi')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -86,13 +90,18 @@ export default function EdukasiPage() {
     }
 
     if (editId !== null) {
-      setArtikel(prev => prev.map(a => a.id === editId
-        ? { ...a, judul, kategori, sasaran, isi: isiHtml, thumbnail }
-        : a
+      setArtikel(prev => prev.map(a =>
+        a.id === editId ? { ...a, judul, kategori, sasaran, isi: isiHtml, thumbnail } : a
       ))
+      alert('Artikel berhasil diperbarui dan akan tampil di halaman Edukasi siswa.')
     } else {
-      const newItem = { id: Date.now(), judul, kategori, sasaran, isi: isiHtml, thumbnail, tayangan: 0, selesai: 0 }
+      const newItem = {
+        id: Date.now(), judul, kategori, sasaran,
+        isi: isiHtml, thumbnail, imagePath: thumbnail,
+        tayangan: 0, selesai: 0,
+      }
       setArtikel(prev => [newItem, ...prev])
+      alert('Artikel berhasil diterbitkan dan akan tampil di halaman Edukasi siswa.')
     }
     resetForm()
   }
@@ -101,7 +110,9 @@ export default function EdukasiPage() {
     <div className="max-w-5xl mx-auto pb-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Edukasi</h1>
-        <p className="text-sm text-gray-500 mt-1 leading-relaxed">Kelola modul perpustakaan, lacak tingkat penyelesaian, dan terbitkan artikel edukasi untuk siswa.</p>
+        <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+          Kelola modul perpustakaan, terbitkan, dan edit artikel yang ditampilkan ke siswa.
+        </p>
       </div>
 
       {/* Stats */}
@@ -109,7 +120,7 @@ export default function EdukasiPage() {
         {[
           { label: 'Jumlah Tayangan', val: '1,450', badge: '+15%', color: 'text-[#3525CD]' },
           { label: 'Rata-Rata Selesai', val: '78%', badge: '+3%', color: 'text-gray-900' },
-          { label: 'Modul Aktif', val: String(artikel.length), badge: '1 Kategori', color: 'text-gray-900' },
+          { label: 'Modul Aktif', val: String(artikel.length), badge: `${artikel.length} Artikel`, color: 'text-gray-900' },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
@@ -121,19 +132,21 @@ export default function EdukasiPage() {
         ))}
       </div>
 
-      {/* Form Unggah/Edit */}
-      <div id="form-edukasi" className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-8">
+      {/* Form */}
+      <div id="form-edukasi" className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-8 scroll-mt-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-bold text-gray-900 text-lg">
               {editId !== null ? '✏️ Edit Artikel' : 'Unggah Artikel Edukasi Baru'}
             </h3>
             <p className="text-sm text-gray-500 mt-0.5">
-              {editId !== null ? 'Ubah konten artikel yang sudah ada.' : 'Artikel yang diterbitkan akan langsung muncul di halaman Edukasi siswa.'}
+              {editId !== null
+                ? 'Ubah konten artikel — perubahan langsung tampil di halaman Edukasi siswa.'
+                : 'Artikel yang diterbitkan akan langsung muncul di halaman Edukasi siswa.'}
             </p>
           </div>
           {editId !== null && (
-            <button onClick={resetForm} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50">
+            <button onClick={resetForm} className="flex items-center gap-1 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50">
               <X size={14} /> Batal Edit
             </button>
           )}
@@ -143,12 +156,12 @@ export default function EdukasiPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1.5">Judul Artikel *</label>
-              <input value={judul} onChange={e => setJudul(e.target.value)} type="text" required placeholder="Masukkan judul materi..." className="w-full bg-white border border-gray-300 text-gray-700 py-2.5 px-4 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]" />
+              <input value={judul} onChange={e => setJudul(e.target.value)} required placeholder="Masukkan judul materi..." className="w-full border border-gray-300 text-gray-700 py-2.5 px-4 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1.5">Kategori Modul</label>
               <div className="relative">
-                <select value={kategori} onChange={e => setKategori(e.target.value)} className="w-full appearance-none bg-white border border-gray-300 text-gray-700 py-2.5 px-4 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]">
+                <select value={kategori} onChange={e => setKategori(e.target.value)} className="w-full appearance-none border border-gray-300 text-gray-700 py-2.5 px-4 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]">
                   {Object.keys(KATEGORI_WARNA).map(k => <option key={k}>{k}</option>)}
                 </select>
                 <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -160,8 +173,8 @@ export default function EdukasiPage() {
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1.5">Kelompok Sasaran</label>
               <div className="relative">
-                <select value={sasaran} onChange={e => setSasaran(e.target.value)} className="w-full appearance-none bg-white border border-gray-300 text-gray-700 py-2.5 px-4 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]">
-                  {['Semua Siswa','Kelas 10','Kelas 11','Kelas 12'].map(k => <option key={k}>{k}</option>)}
+                <select value={sasaran} onChange={e => setSasaran(e.target.value)} className="w-full appearance-none border border-gray-300 text-gray-700 py-2.5 px-4 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]">
+                  {['Semua Siswa', 'Kelas 10', 'Kelas 11', 'Kelas 12'].map(k => <option key={k}>{k}</option>)}
                 </select>
                 <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               </div>
@@ -169,7 +182,7 @@ export default function EdukasiPage() {
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1.5">Tanggal Jatuh Tempo (Opsional)</label>
               <div className="relative">
-                <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full bg-white border border-gray-300 text-gray-700 py-2.5 px-4 pr-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD] cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full" />
+                <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} className="w-full border border-gray-300 text-gray-700 py-2.5 px-4 pr-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD] cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full" />
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
@@ -181,11 +194,11 @@ export default function EdukasiPage() {
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">Thumbnail Foto</label>
             <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={e => handleThumbnail(e.target.files[0])} />
-            {thumbnail ? (
+            {thumbnail && (typeof thumbnail === 'string' && (thumbnail.startsWith('data:') || thumbnail.startsWith('/'))) ? (
               <div className="relative inline-block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={thumbnail} alt="Thumbnail preview" className="h-32 w-48 object-cover rounded-lg border border-gray-200" />
-                <button type="button" onClick={() => { setThumbnail(null); setThumbnailName(''); fileInputRef.current.value = '' }} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow">
+                <img src={thumbnail} alt="Preview" className="h-32 w-48 object-cover rounded-lg border border-gray-200" />
+                <button type="button" onClick={() => { setThumbnail(null); if (fileInputRef.current) fileInputRef.current.value = '' }} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow">
                   <X size={12} />
                 </button>
               </div>
@@ -202,52 +215,49 @@ export default function EdukasiPage() {
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">Isi Artikel *</label>
             <div className="border border-gray-300 rounded-lg overflow-hidden bg-white focus-within:ring-2 focus-within:ring-[#3525CD] focus-within:border-transparent transition-all">
-              {/* Toolbar */}
               <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center gap-0.5 pr-2 border-r border-gray-200">
-                  <ToolbarBtn onClick={() => exec('formatBlock', 'h2')} title="Judul (H2)"><span className="font-bold text-xs">H2</span></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('formatBlock', 'h3')} title="Sub-judul (H3)"><span className="font-bold text-xs">H3</span></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('formatBlock', 'h2')} title="Judul (H2)"><span className="text-xs font-bold">H2</span></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('formatBlock', 'h3')} title="Sub-judul (H3)"><span className="text-xs font-bold">H3</span></ToolbarBtn>
                   <ToolbarBtn onClick={() => exec('formatBlock', 'p')} title="Paragraf"><span className="text-xs">P</span></ToolbarBtn>
                 </div>
                 <div className="flex items-center gap-0.5 px-2 border-r border-gray-200">
-                  <ToolbarBtn onClick={() => exec('bold')} title="Bold"><Bold size={15} /></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('italic')} title="Italic"><Italic size={15} /></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('underline')} title="Underline"><Underline size={15} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('bold')} title="Bold"><Bold size={14} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('italic')} title="Italic"><Italic size={14} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('underline')} title="Underline"><Underline size={14} /></ToolbarBtn>
                 </div>
                 <div className="flex items-center gap-0.5 px-2 border-r border-gray-200">
-                  <ToolbarBtn onClick={() => exec('justifyLeft')} title="Rata Kiri"><AlignLeft size={15} /></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('justifyCenter')} title="Rata Tengah"><AlignCenter size={15} /></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('justifyRight')} title="Rata Kanan"><AlignRight size={15} /></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('justifyFull')} title="Rata Kiri-Kanan"><AlignJustify size={15} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('justifyLeft')} title="Rata Kiri"><AlignLeft size={14} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('justifyCenter')} title="Rata Tengah"><AlignCenter size={14} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('justifyRight')} title="Rata Kanan"><AlignRight size={14} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('justifyFull')} title="Rata Dua Sisi"><AlignJustify size={14} /></ToolbarBtn>
                 </div>
                 <div className="flex items-center gap-0.5 px-2 border-r border-gray-200">
-                  <ToolbarBtn onClick={() => exec('insertUnorderedList')} title="Bullet List"><List size={15} /></ToolbarBtn>
-                  <ToolbarBtn onClick={() => exec('insertOrderedList')} title="Numbered List"><ListOrdered size={15} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('insertUnorderedList')} title="Bullet List"><List size={14} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => exec('insertOrderedList')} title="Numbered List"><ListOrdered size={14} /></ToolbarBtn>
                 </div>
                 <div className="flex items-center gap-0.5 pl-2">
-                  <ToolbarBtn onClick={() => { const url = prompt('Masukkan URL:'); if (url) exec('createLink', url); }} title="Insert Link"><LinkIcon size={15} /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => { const url = prompt('URL:'); if (url) exec('createLink', url) }} title="Insert Link"><LinkIcon size={14} /></ToolbarBtn>
                 </div>
               </div>
-              {/* Editable Area */}
               <div
                 ref={editorRef}
                 contentEditable
                 suppressContentEditableWarning
-                className="min-h-[280px] p-5 text-sm text-gray-700 leading-relaxed outline-none prose prose-sm max-w-none [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-gray-800 [&_h3]:mt-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#3525CD] [&_a]:underline"
                 data-placeholder="Tuliskan isi artikel secara lengkap di sini..."
-                style={{ minHeight: '280px' }}
+                className="min-h-[300px] p-5 text-sm text-gray-700 leading-relaxed outline-none [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-gray-800 [&_h3]:mt-3 [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2 [&_li]:mb-1 [&_p]:mb-3 [&_a]:text-[#3525CD] [&_a]:underline [&_strong]:font-bold [&_em]:italic"
               />
             </div>
           </div>
 
-          <button type="submit" className="w-full bg-[#3525CD] hover:bg-[#2a1d9b] text-white font-bold py-3 rounded-xl transition flex justify-center items-center gap-2 shadow-md mt-2">
+          <button type="submit" className="w-full bg-[#3525CD] hover:bg-[#2a1d9b] text-white font-bold py-3 rounded-xl transition flex justify-center items-center gap-2 shadow-md">
             <Upload size={16} />
             {editId !== null ? 'Simpan Perubahan Artikel' : 'Unggah & Terbitkan Artikel'}
           </button>
         </form>
       </div>
 
-      {/* Library */}
+      {/* Perpustakaan */}
       <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
         <div className="flex items-center gap-2 mb-6">
           <div className="text-[#3525CD]">
@@ -264,12 +274,11 @@ export default function EdukasiPage() {
         ) : (
           <div className="space-y-4">
             {artikel.map((item) => (
-              <div key={item.id} className="p-5 border border-gray-100 rounded-xl flex items-center gap-5 hover:border-gray-300 transition shadow-sm">
+              <div key={item.id} className="p-5 border border-gray-100 rounded-xl flex items-center gap-5 hover:border-[#3525CD]/30 hover:bg-blue-50/20 transition shadow-sm">
                 {/* Thumbnail */}
                 <div className="w-14 h-14 rounded-lg flex-shrink-0 overflow-hidden bg-[#E6EEFF] flex items-center justify-center text-[#3525CD]">
-                  {item.thumbnail
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={item.thumbnail} alt={item.judul} className="w-full h-full object-cover" />
+                  {(item.thumbnail || item.imagePath)
+                    ? <img src={item.thumbnail || item.imagePath} alt={item.judul} className="w-full h-full object-cover" />  // eslint-disable-line @next/next/no-img-element
                     : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                   }
                 </div>
@@ -288,11 +297,11 @@ export default function EdukasiPage() {
                       </div>
                       <span className="text-xs font-bold text-gray-600">{item.selesai}%</span>
                     </div>
-                    <span className="text-xs text-gray-400">{item.tayangan.toLocaleString()} tayangan</span>
+                    <span className="text-xs text-gray-400">{(item.tayangan || 0).toLocaleString()} tayangan</span>
                   </div>
                 </div>
 
-                {/* Edit Button */}
+                {/* Edit */}
                 <button
                   onClick={() => startEdit(item)}
                   className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#3525CD] hover:bg-[#E6EEFF] rounded-full transition flex-shrink-0"
@@ -311,6 +320,7 @@ export default function EdukasiPage() {
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
+          display: block;
         }
       `}</style>
     </div>
