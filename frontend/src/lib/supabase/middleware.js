@@ -71,13 +71,12 @@ export async function updateSession(request) {
     // ketiganya cuma route group tanpa halaman index, jadi setiap login yang
     // berhasil berakhir di 404. Login "berfungsi" tapi tidak ada yang sampai.
     const roleRedirect = {
+      SISWA: '/siswa/edukasi',
       GURU_BK: '/guru-bk/inbox',
       KEPALA_SEKOLAH: '/kepala-sekolah/analitik',
     }
 
     const url = request.nextUrl.clone()
-    // Siswa tidak punya dashboard — jalur siswa memang tanpa login.
-    // Kalau akun siswa entah bagaimana login, pulangkan ke beranda.
     url.pathname = roleRedirect[profile?.role] || '/'
     return NextResponse.redirect(url)
   }

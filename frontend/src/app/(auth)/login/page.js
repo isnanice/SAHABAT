@@ -63,16 +63,14 @@ function FormLogin() {
     }
 
     const tujuan = {
+      SISWA: "/siswa/edukasi",
       GURU_BK: "/guru-bk/inbox",
       KEPALA_SEKOLAH: "/kepala-sekolah/analitik",
     }[profil.role];
 
     if (!tujuan) {
-      // Akun siswa tidak punya dashboard — jalur siswa memang tanpa login.
       await supabase.auth.signOut();
-      setError(
-        "Akun ini bukan akun staf. Siswa tidak perlu login — langsung pakai tombol “Lapor Sekarang” di halaman depan."
-      );
+      setError("Peran akun ini tidak dikenali. Hubungi admin sekolah.");
       setLoading(false);
       return;
     }
@@ -89,8 +87,12 @@ function FormLogin() {
       </div>
 
       <h2 className={styles.cardTitle}>Masuk ke Akun</h2>
+      {/* Jujur soal apa gunanya login. Anak yang mengira harus login dulu
+          untuk melapor bisa mengurungkan niatnya di sini — dan jalur lapor
+          justru sengaja tidak butuh akun. */}
       <p className={styles.cardSubtitle}>
-        Masuk untuk mengakses layanan konseling bersama Guru BK secara aman dan rahasia.
+        Untuk modul edukasi dan Guru BK. Mau melapor?{" "}
+        <Link href="/lapor">Kamu tidak perlu masuk</Link> — laporan tetap anonim.
       </p>
 
       <div className={styles.tabs}>

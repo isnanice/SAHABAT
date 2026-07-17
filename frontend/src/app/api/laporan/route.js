@@ -53,6 +53,22 @@ export async function GET(request) {
 /**
  * POST /api/laporan — siswa mengirim laporan (anonim, tanpa login).
  *
+ * ============ JANGAN PERNAH MEMBACA SESI LOGIN DI SINI ============
+ * Sejak siswa bisa punya akun (untuk modul edukasi & poin), handler ini jadi
+ * titik paling rawan di seluruh sistem. Siswa yang sedang login TETAP
+ * mengirim cookie auth ke route ini — dan sangat menggoda untuk "sekalian"
+ * mengisi pelapor_id karena datanya toh ada.
+ *
+ * JANGAN. Satu baris itu membatalkan seluruh produk: laporan jadi tertaut
+ * identitas, bocornya DB berarti ketahuan siapa melaporkan siapa, dan anak
+ * yang takut pembalasan berhenti melapor.
+ *
+ * Karena itu handler ini SENGAJA hanya memakai createAdminClient()
+ * (service_role) dan tidak pernah memanggil createClient()/auth.getUser().
+ * Constraint DB `laporan_anonim_tanpa_identitas` adalah jaring pengaman
+ * kedua — bukan alasan untuk lengah di sini.
+ * ==================================================================
+ *
  * FAIL-SAFE ADALAH SIFAT UTAMA ROUTE INI.
  *
  * Versi lama memanggil klasifikasiLaporan() di luar try/catch per-langkah:
