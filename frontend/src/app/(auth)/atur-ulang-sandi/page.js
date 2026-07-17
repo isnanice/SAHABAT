@@ -80,8 +80,7 @@ export default function AturUlangSandi() {
   return (
     <div className={styles.card}>
       <div className={styles.logoWrap}>
-        <Image src="/logo.png" alt="SAHABAT Logo" width={32} height={32} style={{ height: "auto" }} />
-        <span style={{ color: "#1e40af", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
+        <Image src="/shbt.svg" alt="SAHABAT Logo" width={140} height={40} style={{ height: "auto" }} />
       </div>
 
       <h2 className={styles.cardTitle}>Atur Ulang Kata Sandi</h2>

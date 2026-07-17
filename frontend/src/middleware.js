@@ -31,5 +31,7 @@ export const config = {
     '/kepala-sekolah/:path*',
     '/login',
     '/register',
+    '/masuk',
+    '/daftar'
   ],
 }

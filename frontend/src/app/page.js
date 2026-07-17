@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import { 
+import { useMemo, useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import {
   ArrowUpRight, 
   Users, 
   User, 
@@ -18,6 +19,23 @@ import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function RedesignLanding() {
+  const [user, setUser] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user || null);
+    });
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setShowDropdown(false);
+  }
+
   const navItems = useMemo(
     () => [
       { label: "Beranda", href: "/", active: true },
@@ -177,12 +195,32 @@ export default function RedesignLanding() {
         </nav>
         
         <div className={styles.authButtons}>
-          <Link href="/login" className={styles.loginBtn}>
-            Masuk
-          </Link>
-          <Link href="/register" className={styles.signInBtn}>
-            Daftar
-          </Link>
+          {user ? (
+            <div style={{ position: "relative" }}>
+              <button 
+                onClick={() => setShowDropdown(!showDropdown)} 
+                style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              >
+                <Image src="/h3.svg" alt="User Profile" width={40} height={40} />
+              </button>
+              {showDropdown && (
+                <div style={{ position: "absolute", top: "100%", right: 0, marginTop: "8px", background: "white", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)", padding: "8px", zIndex: 10, border: "1px solid #e5e7eb" }}>
+                  <button onClick={handleSignOut} style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", fontWeight: 600, padding: "8px 16px", width: "100%", textAlign: "left", whiteSpace: "nowrap" }}>
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <Link href="/masuk" className={styles.loginBtn}>
+                Masuk
+              </Link>
+              <Link href="/daftar" className={styles.signInBtn}>
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
       </header>
 

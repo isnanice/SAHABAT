@@ -5,7 +5,7 @@ import styles from "./layout.module.css";
 
 export default function AuthLayout({ children }) {
   const pathname = usePathname();
-  const isRegister = pathname === "/register";
+  const isRegister = pathname === "/daftar";
 
   return (
     <div className={styles.authContainer}>

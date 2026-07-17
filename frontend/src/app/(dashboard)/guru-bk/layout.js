@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import HeaderDashboard from '@/components/HeaderDashboard'
+import DashboardLayoutClient from '@/components/DashboardLayoutClient'
 
 export default async function GuruBKLayout({ children }) {
   const supabase = await createClient()
@@ -21,9 +21,8 @@ export default async function GuruBKLayout({ children }) {
   if (profile?.role !== 'GURU_BK' || !profile?.aktif) redirect('/')
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <HeaderDashboard nama={profile.full_name} peran="Guru BK" beranda="/guru-bk/inbox" />
-      <main>{children}</main>
-    </div>
+    <DashboardLayoutClient profile={profile} peran="Guru BK">
+      {children}
+    </DashboardLayoutClient>
   )
 }

@@ -55,7 +55,7 @@ export async function updateSession(request) {
   }
 
   // Redirect ke dashboard jika sudah login dan akses halaman auth
-  const authPaths = ['/login', '/register']
+  const authPaths = ['/login', '/register', '/masuk', '/daftar']
   const isAuth = authPaths.some(p => request.nextUrl.pathname.startsWith(p))
 
   if (isAuth && user) {
@@ -86,7 +86,8 @@ export async function updateSession(request) {
     }
 
     const url = request.nextUrl.clone()
-    url.pathname = roleRedirect[profile?.role] || '/'
+    // Siswa redirect to /
+    url.pathname = profile?.role === 'SISWA' ? '/' : (roleRedirect[profile?.role] || '/')
     // Tandai supaya dashboard tahu ini pantulan, bukan hasil login barusan —
     // dipakai menampilkan "kamu sudah masuk sebagai X, mau ganti akun?".
     url.searchParams.set('sudah_masuk', '1')

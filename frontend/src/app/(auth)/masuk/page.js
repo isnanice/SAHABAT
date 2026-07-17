@@ -9,13 +9,14 @@ import { createClient } from "@/lib/supabase/client";
 import styles from "../auth.module.css";
 
 /**
- * Login staf sekolah — halaman /login.
+ * Login siswa — halaman /masuk.
  *
- * HANYA untuk Guru BK dan Kepala Sekolah. Siswa masuk lewat /masuk.
- * Dashboard staf diakses melalui /login → redirect ke /guru-bk/inbox
- * atau /kepala-sekolah/analitik setelah berhasil masuk.
+ * Siswa yang sudah mendaftar bisa langsung masuk di sini dengan email dan
+ * kata sandi yang sudah didaftarkan. Setelah masuk, diarahkan ke landing page.
+ *
+ * Staf sekolah (Guru BK / Kepala Sekolah) masuk lewat /login, bukan di sini.
  */
-function FormLogin() {
+function FormMasuk() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -56,19 +57,14 @@ function FormLogin() {
       return;
     }
 
-    const tujuan = {
-      GURU_BK: "/guru-bk/inbox",
-      KEPALA_SEKOLAH: "/kepala-sekolah/analitik",
-    }[profil.role];
-
-    if (!tujuan) {
+    if (profil.role !== "SISWA") {
       await supabase.auth.signOut();
-      setError("Halaman ini khusus staf sekolah. Siswa silakan masuk melalui /masuk");
+      setError("Halaman ini khusus siswa. Staf sekolah silakan masuk melalui /login");
       setLoading(false);
       return;
     }
 
-    router.push(params.get("redirect") || tujuan);
+    router.push(params.get("redirect") || "/");
     router.refresh();
   }
 
@@ -78,9 +74,9 @@ function FormLogin() {
         <Image src="/logo1.svg" alt="SAHABAT Logo" width={140} height={40} style={{ height: "auto" }} />
       </div>
 
-      <h2 className={styles.cardTitle}>Login Staf Sekolah</h2>
+      <h2 className={styles.cardTitle}>Masuk ke Akun</h2>
       <p className={styles.cardSubtitle}>
-        Masuk untuk mengakses dashboard Guru BK atau Kepala Sekolah.
+        Masuk untuk mengakses layanan konseling bersama Guru BK secara aman dan rahasia.
       </p>
 
       {params.get("ganti") === "1" && (
@@ -105,7 +101,8 @@ function FormLogin() {
       )}
 
       <div className={styles.tabs}>
-        <div className={`${styles.tab} ${styles.active}`}>Login Staf</div>
+        <div className={`${styles.tab} ${styles.active}`}>Masuk</div>
+        <Link href="/daftar" className={styles.tab}>Daftar</Link>
       </div>
 
       <form onSubmit={masuk}>
@@ -153,7 +150,17 @@ function FormLogin() {
           </p>
         )}
 
-        <button type="submit" className={styles.submitBtn} disabled={loading} style={{ marginTop: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", marginBottom: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <input type="checkbox" id="ingat" className={styles.checkbox} />
+            <label htmlFor="ingat" className={styles.checkboxLabel} style={{ margin: 0 }}>Ingat saya</label>
+          </div>
+          <Link href="/forgot-password" className={styles.forgotLink} style={{ margin: 0 }}>
+            Lupa Sandi?
+          </Link>
+        </div>
+
+        <button type="submit" className={styles.submitBtn} disabled={loading}>
           {loading ? (
             <>
               Memproses <Loader2 size={20} className="animate-spin" />
@@ -166,11 +173,14 @@ function FormLogin() {
         </button>
       </form>
 
+      <p className={styles.footerText}>
+        Belum punya akun? <Link href="/daftar">Daftar di sini</Link>
+      </p>
     </div>
   );
 }
 
-export default function LoginPage() {
+export default function MasukPage() {
   return (
     <Suspense
       fallback={
@@ -179,7 +189,7 @@ export default function LoginPage() {
         </div>
       }
     >
-      <FormLogin />
+      <FormMasuk />
     </Suspense>
   );
 }

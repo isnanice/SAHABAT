@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import HeaderDashboard from '@/components/HeaderDashboard'
+import DashboardLayoutClient from '@/components/DashboardLayoutClient'
 
 export default async function KepalaSekolahLayout({ children }) {
   const supabase = await createClient()
@@ -19,13 +19,8 @@ export default async function KepalaSekolahLayout({ children }) {
   if (profile?.role !== 'KEPALA_SEKOLAH' || !profile?.aktif) redirect('/')
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <HeaderDashboard
-        nama={profile.full_name}
-        peran="Kepala Sekolah"
-        beranda="/kepala-sekolah/analitik"
-      />
-      <main>{children}</main>
-    </div>
+    <DashboardLayoutClient profile={profile} peran="Kepala Sekolah">
+      {children}
+    </DashboardLayoutClient>
   )
 }

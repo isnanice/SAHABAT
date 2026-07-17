@@ -58,8 +58,7 @@ export default function ForgotPassword() {
   return (
     <div className={styles.card}>
       <div className={styles.logoWrap}>
-        <Image src="/logo.png" alt="SAHABAT Logo" width={32} height={32} style={{ height: "auto" }} />
-        <span style={{ color: "#1e40af", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
+        <Image src="/shbt.svg" alt="SAHABAT Logo" width={140} height={40} style={{ height: "auto" }} />
       </div>
 
       <h2 className={styles.cardTitle}>Lupa Kata Sandi</h2>
@@ -68,8 +67,8 @@ export default function ForgotPassword() {
       </p>
 
       <div className={styles.tabs}>
-        <Link href="/login" className={`${styles.tab} ${styles.active}`}>Masuk</Link>
-        <Link href="/register" className={styles.tab}>Daftar</Link>
+        <Link href="/masuk" className={`${styles.tab} ${styles.active}`}>Masuk</Link>
+        <Link href="/daftar" className={styles.tab}>Daftar</Link>
       </div>
 
       {terkirim ? (
@@ -80,7 +79,7 @@ export default function ForgotPassword() {
               Kami telah mengirimkan tautan pengaturan ulang kata sandi Anda melalui email.
             </span>
           </div>
-          <Link href="/login" style={{ textDecoration: "none" }}>
+          <Link href="/masuk" style={{ textDecoration: "none" }}>
             <button type="button" className={styles.submitBtnOutline}>
               <ArrowLeft size={18} /> Kembali ke Masuk
             </button>
@@ -121,7 +120,7 @@ export default function ForgotPassword() {
             )}
           </button>
 
-          <Link href="/login" style={{ textDecoration: "none" }}>
+          <Link href="/masuk" style={{ textDecoration: "none" }}>
             <button type="button" className={styles.submitBtnOutline}>
               <ArrowLeft size={18} /> Kembali ke Masuk
             </button>
