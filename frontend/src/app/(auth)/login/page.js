@@ -90,8 +90,7 @@ function FormLogin() {
 
       <h2 className={styles.cardTitle}>Masuk ke Akun</h2>
       <p className={styles.cardSubtitle}>
-        Halaman ini untuk Guru BK dan pihak sekolah. Kalau kamu siswa dan ingin
-        melapor, <Link href="/lapor">kamu tidak perlu login</Link>.
+        Masuk untuk mengakses layanan konseling bersama Guru BK secara aman dan rahasia.
       </p>
 
       <div className={styles.tabs}>
@@ -110,7 +109,7 @@ function FormLogin() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={styles.input}
-            placeholder="nama@sekolah.sch.id"
+            placeholder="contoh@gmail.com"
           />
         </div>
 
@@ -125,7 +124,7 @@ function FormLogin() {
               value={sandi}
               onChange={(e) => setSandi(e.target.value)}
               className={styles.input}
-              placeholder="Kata sandi"
+              placeholder="Minimal 8 karakter"
             />
             <button
               type="button"
@@ -145,7 +144,11 @@ function FormLogin() {
           </p>
         )}
 
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", marginBottom: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <input type="checkbox" id="ingat" className={styles.checkbox} />
+            <label htmlFor="ingat" className={styles.checkboxLabel} style={{ margin: 0 }}>Ingat saya</label>
+          </div>
           <Link href="/forgot-password" className={styles.forgotLink} style={{ margin: 0 }}>
             Lupa Sandi?
           </Link>
@@ -163,6 +166,10 @@ function FormLogin() {
           )}
         </button>
       </form>
+
+      <p className={styles.footerText}>
+        Belum punya akun? <Link href="/register">Daftar di sini</Link>
+      </p>
     </div>
   );
 }

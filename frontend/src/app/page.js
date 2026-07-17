@@ -78,14 +78,6 @@ export default function RedesignLanding() {
         cta: "Mulai di Ruang Aman",
       },
       {
-        title: "Lapor Insiden",
-        description: "Sudah tahu mau cerita apa? Tulis langsung tanpa lewat chat. Laporanmu masuk ke antrean Guru BK sekolahmu.",
-        iconPath: "/laporinsiden.svg",
-        iconBg: "#FEF3DB",
-        href: "/lapor",
-        cta: "Lapor Sekarang",
-      },
-      {
         title: "Lacak Laporan",
         description: "Pantau laporanmu pakai kode tiket. Lihat statusnya dan balasan Guru BK, tanpa perlu login dan tanpa menyebut namamu.",
         iconPath: "/ruangdukungansebaya.svg",
@@ -94,22 +86,19 @@ export default function RedesignLanding() {
         cta: "Cek Laporan Saya",
       },
       {
-        // Belum dibangun (rencana kita men-skip-nya untuk demo). "Identitas
-        // terlindungi sepenuhnya" juga dihapus — itu klaim absolut yang tidak
-        // bisa dijanjikan, sekelas dengan klaim E2EE yang sudah kita buang.
+        title: "Ruang Dukungan Sebaya",
+        description: "Forum moderasi tertutup tempat siswa saling mendukung, diawasi Guru BK.",
+        iconPath: "/peersupporter.svg",
+        iconBg: "#F3E8FF",
+        segera: true,
+      },
+      {
         title: "Konseling BK",
         description: "Jadwal sesi tatap muka atau online dengan Guru BK, lewat tiket anonimmu.",
         iconPath: "/konselingbk.svg",
         iconBg: "#FFDAD6",
         imagePath: "/konselingbk.png",
         isLarge: true,
-        segera: true,
-      },
-      {
-        title: "Ruang Dukungan Sebaya",
-        description: "Forum moderasi tertutup tempat siswa saling mendukung, diawasi Guru BK.",
-        iconPath: "/peersupporter.svg",
-        iconBg: "#F3E8FF",
         segera: true,
       },
     ],
@@ -189,10 +178,10 @@ export default function RedesignLanding() {
         
         <div className={styles.authButtons}>
           <Link href="/login" className={styles.loginBtn}>
-            Login
+            Masuk
           </Link>
-          <Link href="/login" className={styles.signInBtn}>
-            Sign In
+          <Link href="/register" className={styles.signInBtn}>
+            Daftar
           </Link>
         </div>
       </header>

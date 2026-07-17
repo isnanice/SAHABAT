@@ -64,12 +64,11 @@ export default function ForgotPassword() {
 
       <h2 className={styles.cardTitle}>Lupa Kata Sandi</h2>
       <p className={styles.cardSubtitle}>
-        Untuk akun Guru BK dan pihak sekolah. Kalau kamu siswa,{" "}
-        <Link href="/lapor">kamu tidak perlu akun sama sekali</Link>.
+        Masukkan alamat email yang terdaftar. Kami akan mengirimkan tautan (link) untuk mengatur ulang kata sandi Anda secara aman.
       </p>
 
       <div className={styles.tabs}>
-        <Link href="/login" className={styles.tab}>Masuk</Link>
+        <Link href="/login" className={`${styles.tab} ${styles.active}`}>Masuk</Link>
         <Link href="/register" className={styles.tab}>Daftar</Link>
       </div>
 
@@ -78,8 +77,7 @@ export default function ForgotPassword() {
           <div className={styles.successBox}>
             <CheckCircle2 size={20} style={{ flexShrink: 0, marginTop: "2px" }} />
             <span>
-              Kalau <strong>{email}</strong> terdaftar sebagai akun staf, tautan
-              pengaturan ulang sudah dikirim ke email itu. Cek juga folder spam.
+              Kami telah mengirimkan tautan pengaturan ulang kata sandi Anda melalui email.
             </span>
           </div>
           <Link href="/login" style={{ textDecoration: "none" }}>
@@ -100,7 +98,7 @@ export default function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={styles.input}
-              placeholder="nama@sekolah.sch.id"
+              placeholder="contoh@gmail.com"
             />
           </div>
 

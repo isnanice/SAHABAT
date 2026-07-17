@@ -137,10 +137,10 @@ export default function TentangPage() {
         
         <div className={styles.authButtons}>
           <Link href="/login" className={styles.loginBtn}>
-            Login
+            Masuk
           </Link>
-          <Link href="/login" className={styles.signInBtn}>
-            Sign In
+          <Link href="/register" className={styles.signInBtn}>
+            Daftar
           </Link>
         </div>
       </header>
