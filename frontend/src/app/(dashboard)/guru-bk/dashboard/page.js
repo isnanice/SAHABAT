@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { Calendar, MoreVertical } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -133,7 +134,7 @@ export default function DashboardPage() {
               <h3 className="font-bold text-gray-900">Kasus Membutuhkan Perhatian</h3>
               <p className="text-xs text-gray-500 mt-1">Daftar diurutkan berdasarkan tingkat urgensi.</p>
             </div>
-            <button className="text-sm font-medium text-[#3525CD] hover:text-[#2a1d9b]">Lihat Semua</button>
+            <Link href="/guru-bk/inbox" className="text-sm font-medium text-[#3525CD] hover:text-[#2a1d9b]">Lihat Semua</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">

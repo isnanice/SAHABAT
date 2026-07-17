@@ -40,6 +40,11 @@ export default function InboxPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [tabAktif, setTabAktif] = useState('Semua Laporan')
+  
+  // Filter states
+  const [filterUrgensi, setFilterUrgensi] = useState('Semua')
+  const [filterStatus, setFilterStatus] = useState('Semua')
+  const [filterKategori, setFilterKategori] = useState('Semua')
 
   useEffect(() => {
     let batal = false
@@ -69,8 +74,18 @@ export default function InboxPage() {
     return new Date(b.created_at) - new Date(a.created_at) // Newer first if same urgency
   })
 
-  // Filter based on active tab
-  const dataDitampilkan = tabAktif === 'Semua Laporan' ? urut : urut.filter(l => l.status === 'DIPROSES') // Assuming "Tugas Saya" is currently in process
+  // Filter based on active tab and dropdowns
+  let dataDitampilkan = tabAktif === 'Semua Laporan' ? urut : urut.filter(l => l.status === 'DIPROSES')
+
+  if (filterUrgensi !== 'Semua') {
+    dataDitampilkan = dataDitampilkan.filter(l => (l.urgensi_final || 'RENDAH') === filterUrgensi.toUpperCase())
+  }
+  if (filterStatus !== 'Semua') {
+    dataDitampilkan = dataDitampilkan.filter(l => (l.status || 'MENUNGGU') === filterStatus.toUpperCase())
+  }
+  if (filterKategori !== 'Semua') {
+    dataDitampilkan = dataDitampilkan.filter(l => l.jenis_final === filterKategori)
+  }
 
   const menunggu = (l) => l.ai_gagal && l.ai_klasifikasi?.menunggu === true
   const perluBaca = (l) =>
@@ -158,23 +173,54 @@ export default function InboxPage() {
       {/* Table Filters */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 4H14M4 8H12M6 12H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Semua Urgensi
-            <ChevronDown size={16} />
-          </button>
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-            Semua Status
-            <ChevronDown size={16} />
-          </button>
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-            Semua Kategori
-            <ChevronDown size={16} />
-          </button>
+          <div className="relative">
+            <select
+              value={filterUrgensi}
+              onChange={(e) => setFilterUrgensi(e.target.value)}
+              className="appearance-none flex items-center gap-2 pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#3525CD]"
+            >
+              <option value="Semua">Semua Urgensi</option>
+              <option value="Kritis">Kritis</option>
+              <option value="Tinggi">Tinggi</option>
+              <option value="Sedang">Sedang</option>
+              <option value="Rendah">Rendah</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+          
+          <div className="relative">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="appearance-none flex items-center gap-2 pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#3525CD]"
+            >
+              <option value="Semua">Semua Status</option>
+              <option value="Menunggu">Menunggu</option>
+              <option value="Diproses">Analisis</option>
+              <option value="Selesai">Selesai</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+
+          <div className="relative">
+            <select
+              value={filterKategori}
+              onChange={(e) => setFilterKategori(e.target.value)}
+              className="appearance-none flex items-center gap-2 pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#3525CD]"
+            >
+              <option value="Semua">Semua Kategori</option>
+              <option value="Fisik">Fisik</option>
+              <option value="Verbal">Verbal</option>
+              <option value="Siber">Siber</option>
+              <option value="Sosial">Sosial</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <button 
+          onClick={() => alert('Fitur Export CSV akan segera hadir.')}
+          className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
           <Download size={16} />
           Export CSV
         </button>

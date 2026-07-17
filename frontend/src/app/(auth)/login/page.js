@@ -57,7 +57,7 @@ function FormLogin() {
     }
 
     const tujuan = {
-      GURU_BK: "/guru-bk/inbox",
+      GURU_BK: "/guru-bk/dashboard",
       KEPALA_SEKOLAH: "/kepala-sekolah/analitik",
     }[profil.role];
 

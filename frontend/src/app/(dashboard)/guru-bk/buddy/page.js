@@ -1,8 +1,18 @@
 "use client";
 
+import { useState } from 'react'
 import { UserPlus, Search, Filter } from 'lucide-react'
 
 export default function BuddyPage() {
+  const [search, setSearch] = useState('')
+  
+  const activeBuddies = [
+    { initial: 'D', name: 'David', color: 'bg-blue-600', status: 'Terlatih (1)', statusColor: 'bg-green-100 text-green-700', active: '2 / 3', rating: '4.8', ratingIcon: true },
+    { initial: 'S', name: 'Sarah', color: 'bg-indigo-200 text-indigo-700', status: 'Pelatihan (80%)', statusColor: 'bg-blue-100 text-blue-700', active: 'N/A', rating: 'Baru', ratingIcon: false },
+    { initial: 'N', name: 'Nuha', color: 'bg-orange-200 text-orange-800', status: 'Terlatih (1)', statusColor: 'bg-green-100 text-green-700', active: '1 / 2', rating: '4.5', ratingIcon: true },
+  ]
+
+  const filteredBuddies = activeBuddies.filter(b => b.name.toLowerCase().includes(search.toLowerCase()))
   return (
     <div className="max-w-5xl mx-auto pb-10">
       <div className="mb-8">
@@ -60,7 +70,7 @@ export default function BuddyPage() {
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-gray-900 text-lg">Permintaan Tertunda (2)</h3>
-            <button className="text-sm font-medium text-[#3525CD] hover:text-[#2a1d9b]">Lihat Semua</button>
+            <button onClick={() => alert('Menampilkan semua permintaan tertunda...')} className="text-sm font-medium text-[#3525CD] hover:text-[#2a1d9b]">Lihat Semua</button>
           </div>
           <div className="space-y-4">
             <div className="p-4 border border-gray-100 rounded-xl hover:border-gray-200 transition-colors bg-white flex items-center justify-between">
@@ -73,7 +83,7 @@ export default function BuddyPage() {
                   <p className="text-xs text-gray-500 mt-0.5 max-w-[200px] line-clamp-2">Membutuhkan teman belajar dan dukungan untuk mengatasi kecemasan.</p>
                 </div>
               </div>
-              <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-[#3525CD] hover:bg-gray-50 transition">
+              <button onClick={() => alert('Berhasil menyetujui permintaan Azka')} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-[#3525CD] hover:bg-gray-50 transition" title="Setujui Permintaan">
                 <UserPlus size={16} />
               </button>
             </div>
@@ -88,7 +98,7 @@ export default function BuddyPage() {
                   <p className="text-xs text-gray-500 mt-0.5 max-w-[200px] line-clamp-2">Mencari dukungan dari sesama penderita.</p>
                 </div>
               </div>
-              <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-[#3525CD] hover:bg-gray-50 transition">
+              <button onClick={() => alert('Berhasil menyetujui permintaan')} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-[#3525CD] hover:bg-gray-50 transition" title="Setujui Permintaan">
                 <UserPlus size={16} />
               </button>
             </div>
@@ -108,7 +118,7 @@ export default function BuddyPage() {
                 <div>
                   <h4 className="font-semibold text-red-900 text-sm">Peringatan Keterlibatan Rendah</h4>
                   <p className="text-xs text-red-700 mt-1">Pasangan #402 (Sam & Chris) belum berkomunikasi selama 14 hari.</p>
-                  <a href="#" className="inline-block mt-2 text-xs font-bold text-red-900 underline">Ulasan</a>
+                  <button onClick={() => alert('Menampilkan ulasan evaluasi untuk Pasangan #402')} className="inline-block mt-2 text-xs font-bold text-red-900 underline hover:text-red-700">Ulasan</button>
                 </div>
               </div>
             </div>
@@ -119,7 +129,7 @@ export default function BuddyPage() {
                 <div>
                   <h4 className="font-semibold text-[#1e1577] text-sm">Catatan Umpan Balik</h4>
                   <p className="text-xs text-[#3525CD] mt-1">Buddy &apos;Emma&apos; melaporkan sedikit konflik dalam sesi terakhir.</p>
-                  <a href="#" className="inline-block mt-2 text-xs font-bold text-[#1e1577] underline">Lihat Detail</a>
+                  <button onClick={() => alert('Membuka detail catatan umpan balik sesi...')} className="inline-block mt-2 text-xs font-bold text-[#1e1577] underline hover:text-[#3525CD]">Lihat Detail</button>
                 </div>
               </div>
             </div>
@@ -141,11 +151,13 @@ export default function BuddyPage() {
               </div>
               <input
                 type="text"
-                placeholder="Filter..."
+                placeholder="Cari nama buddy..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 className="w-48 pl-9 pr-3 py-1.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#3525CD]/30"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <button onClick={() => alert('Membuka opsi filter tingkat lanjut...')} className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50">
               <Filter size={14} />
               Filter
             </button>
@@ -164,75 +176,46 @@ export default function BuddyPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
-              <tr className="hover:bg-gray-50/50 transition">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-xs">
-                      D
-                    </div>
-                    <span className="font-medium text-gray-900">David</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="inline-block px-2.5 py-1 bg-green-100 text-green-700 font-medium text-[11px] rounded-full">Terlatih (1)</span>
-                </td>
-                <td className="px-6 py-4 text-gray-700 font-medium">2 / 3</td>
-                <td className="px-6 py-4 flex items-center gap-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-orange-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <span className="font-medium text-gray-900">4.8</span>
-                </td>
-                <td className="px-6 py-4">
-                  <button className="text-[#3525CD] font-medium hover:underline">Kelola</button>
-                </td>
-              </tr>
-              
-              <tr className="hover:bg-gray-50/50 transition">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-indigo-200 text-indigo-700 flex items-center justify-center font-semibold text-xs">
-                      S
-                    </div>
-                    <span className="font-medium text-gray-900">Sarah</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="inline-block px-2.5 py-1 bg-blue-100 text-blue-700 font-medium text-[11px] rounded-full">Pelatihan (80%)</span>
-                </td>
-                <td className="px-6 py-4 text-gray-700 font-medium">N/A</td>
-                <td className="px-6 py-4 flex items-center gap-1.5">
-                  <span className="text-gray-500 italic">Baru</span>
-                </td>
-                <td className="px-6 py-4">
-                  <button className="text-[#3525CD] font-medium hover:underline">Kelola</button>
-                </td>
-              </tr>
-              
-              <tr className="hover:bg-gray-50/50 transition">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-orange-200 text-orange-800 flex items-center justify-center font-semibold text-xs">
-                      N
-                    </div>
-                    <span className="font-medium text-gray-900">Nuha</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="inline-block px-2.5 py-1 bg-green-100 text-green-700 font-medium text-[11px] rounded-full">Terlatih (1)</span>
-                </td>
-                <td className="px-6 py-4 text-gray-700 font-medium">1 / 2</td>
-                <td className="px-6 py-4 flex items-center gap-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-orange-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <span className="font-medium text-gray-900">4.5</span>
-                </td>
-                <td className="px-6 py-4">
-                  <button className="text-[#3525CD] font-medium hover:underline">Kelola</button>
-                </td>
-              </tr>
+              {filteredBuddies.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                    Tidak ditemukan relawan dengan nama "{search}"
+                  </td>
+                </tr>
+              ) : (
+                filteredBuddies.map((buddy, index) => (
+                  <tr key={index} className="hover:bg-gray-50/50 transition">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full ${buddy.color} ${!buddy.color.includes('text') && 'text-white'} flex items-center justify-center font-semibold text-xs`}>
+                          {buddy.initial}
+                        </div>
+                        <span className="font-medium text-gray-900">{buddy.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-2.5 py-1 ${buddy.statusColor} font-medium text-[11px] rounded-full`}>{buddy.status}</span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-700 font-medium">{buddy.active}</td>
+                    <td className="px-6 py-4 flex items-center gap-1.5">
+                      {buddy.ratingIcon && (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-orange-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      )}
+                      <span className={buddy.ratingIcon ? "font-medium text-gray-900" : "text-gray-500 italic"}>
+                        {buddy.rating}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button onClick={() => alert(`Mengelola profil buddy: ${buddy.name}`)} className="text-[#3525CD] font-medium hover:underline">Kelola</button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
         <div className="p-4 border-t border-gray-100 text-center">
-          <button className="text-xs font-medium text-gray-500 hover:text-gray-800 transition">Lihat Daftar Lengkap</button>
+          <button onClick={() => alert('Memuat halaman daftar relawan lengkap...')} className="text-xs font-medium text-gray-500 hover:text-gray-800 transition">Lihat Daftar Lengkap</button>
         </div>
       </div>
     </div>

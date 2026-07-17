@@ -14,11 +14,13 @@ import { createClient } from "@/lib/supabase/client";
 export default function HeaderPublic({ navItems, styles }) {
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       setUser(data?.user || null);
+      setIsChecking(false);
     });
   }, []);
 
@@ -62,7 +64,9 @@ export default function HeaderPublic({ navItems, styles }) {
       </nav>
 
       <div className={styles.authButtons}>
-        {user ? (
+        {isChecking ? (
+          <div style={{ width: "120px", height: "40px" }} />
+        ) : user ? (
           <div style={{ position: "relative" }}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
