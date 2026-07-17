@@ -95,6 +95,30 @@ function FormLogin() {
         <Link href="/lapor">Kamu tidak perlu masuk</Link> — laporan tetap anonim.
       </p>
 
+      {/* Sampai di sini dengan ?ganti=1 = sengaja mau berganti akun sementara
+          masih ada sesi lama. Beri tahu bahwa dia harus keluar dulu, jangan
+          diam-diam gagal. */}
+      {params.get("ganti") === "1" && (
+        <p
+          style={{
+            fontSize: 13,
+            lineHeight: 1.6,
+            color: "#92400e",
+            background: "#fffbeb",
+            border: "1px solid #fcd34d",
+            borderRadius: 12,
+            padding: 12,
+            marginBottom: 16,
+          }}
+        >
+          Masih ada akun yang sedang masuk di perangkat ini.{" "}
+          <Link href="/keluar" style={{ color: "#4f46e5", fontWeight: 600 }}>
+            Keluar dulu
+          </Link>{" "}
+          sebelum masuk dengan akun lain.
+        </p>
+      )}
+
       <div className={styles.tabs}>
         <div className={`${styles.tab} ${styles.active}`}>Masuk</div>
         <Link href="/register" className={styles.tab}>Daftar</Link>

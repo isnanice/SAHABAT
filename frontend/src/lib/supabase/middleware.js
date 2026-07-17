@@ -59,7 +59,16 @@ export async function updateSession(request) {
   const isAuth = authPaths.some(p => request.nextUrl.pathname.startsWith(p))
 
   if (isAuth && user) {
-    // Ambil role dari profile
+    // Pengguna yang SUDAH login membuka /login atau /register.
+    //
+    // `?ganti=1` = dia sengaja mau berganti akun. Tanpa jalan keluar ini,
+    // sesi yang tersangkut jadi jebakan: Guru BK yang browsernya masih punya
+    // sesi siswa akan terus dipantulkan ke /siswa/edukasi dan TIDAK PERNAH
+    // bisa membuka form login. Persis itu yang terjadi saat diuji.
+    if (request.nextUrl.searchParams.get('ganti') === '1') {
+      return supabaseResponse
+    }
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -78,6 +87,9 @@ export async function updateSession(request) {
 
     const url = request.nextUrl.clone()
     url.pathname = roleRedirect[profile?.role] || '/'
+    // Tandai supaya dashboard tahu ini pantulan, bukan hasil login barusan —
+    // dipakai menampilkan "kamu sudah masuk sebagai X, mau ganti akun?".
+    url.searchParams.set('sudah_masuk', '1')
     return NextResponse.redirect(url)
   }
 
