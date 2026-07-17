@@ -41,6 +41,20 @@ export const KATEGORI_KRISIS = {
   BUNUH_DIRI: 'bunuh_diri',
   SELF_HARM: 'self_harm',
   KEKERASAN_SEKSUAL: 'kekerasan_seksual',
+  // Kategori KEEMPAT, di luar tiga yang spec §1c sebutkan.
+  //
+  // Ditambahkan setelah uji nyata menemukan celahnya: siswa menulis "aku
+  // hampir dibunuh, di kantin, baru saja, sudah 3 kali". AI menandainya
+  // KRITIS ("ancaman fisik serius") dan laporannya naik ke puncak antrean —
+  // tapi flag_krisis TIDAK menyala, jadi anak itu TIDAK dapat panel darurat.
+  // Bot menjawabnya seperti obrolan biasa.
+  //
+  // Spec §1c cuma menyebut bunuh diri / self-harm / kekerasan seksual. Anak
+  // yang baru saja hampir dibunuh sedang dalam bahaya sekarang, dan pesan
+  // panel darurat ("temui orang dewasa yang kamu percaya SECEPATNYA") persis
+  // yang dia butuhkan. Menahannya karena kategori tidak tertulis di spec itu
+  // membaca aturan, bukan membaca anak.
+  BAHAYA_FISIK: 'bahaya_fisik',
 }
 
 /**
@@ -95,6 +109,29 @@ const POLA = [
   { kategori: KATEGORI_KRISIS.SELF_HARM, re: /\b(overdosis|od)\s+(obat|pil)\b/ },
   { kategori: KATEGORI_KRISIS.SELF_HARM, re: /\bminum obat\s+(banyak|sekaligus|banyak banget)\b/ },
   { kategori: KATEGORI_KRISIS.SELF_HARM, re: /\b(bakar|membakar|nyundut|sundut)\s+(tangan|lengan|kulit|diri)\b/ },
+
+  // --- Bahaya fisik langsung ---
+  //
+  // JANGAN pakai pola telanjang /\bdibunuh\b/. "Dibunuh" adalah idiom
+  // sehari-hari yang sangat umum: "gue dibunuh nyokap kalau pulang telat",
+  // "aku dibunuh tugas". Pola telanjang akan menyalakan panel darurat ke anak
+  // yang cuma takut dimarahi — lalu semua orang belajar mengabaikan panelnya.
+  // Setiap pola di bawah menuntut konteks bahaya nyata di sekitarnya.
+  //
+  // Juga JANGAN masukkan "dipukul" biasa: itu perundungan fisik yang memang
+  // ditangani jalur laporan normal, bukan keadaan darurat. Yang masuk sini
+  // hanya yang menandakan anak sedang/hampir celaka serius.
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\bhampir (dibunuh|dibacok|ditusuk|mati dipukul)\b/ },
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\b(diancam|ngancem|mengancam|ngancam)\s+(mau\s+|akan\s+)?(bunuh|dibunuh|bacok|dibacok|tusuk|ditusuk)\b/ },
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\b(dikeroyok|dikroyok|dikeroyokin)\b/ },
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\b(ditodong|todongin|ditodongin)\b/ },
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\b(dibacok|ditusuk|ditusukin)\b/ },
+  // "ngancam"/"ngancem" ditulis tanpa spasi setelah "ng" — \bancam\b TIDAK
+  // cocok di dalamnya (tidak ada batas kata). Varian imbuhan gaul harus
+  // disebut eksplisit, kalau tidak polanya bocor diam-diam.
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\b(bawa|pakai|pake|megang)\s+(pisau|golok|celurit|senjata|cutter)\b.{0,30}\b(ancam|ngancam|ngancem|mengancam|todong|todongin|nodong|nyerang|serang|takut)\b/ },
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\bdipukuli\s+(rame-rame|beramai|banyak orang|terus)\b/ },
+  { kategori: KATEGORI_KRISIS.BAHAYA_FISIK, re: /\b(mau|akan|bakal)\s+dibunuh\s+(sama|ama)\s+(kakak kelas|temen|teman|mereka|geng)\b/ },
 
   // --- Kekerasan seksual ---
   { kategori: KATEGORI_KRISIS.KEKERASAN_SEKSUAL, re: /\b(diperkosa|memperkosa|perkosa|pemerkosaan)\b/ },

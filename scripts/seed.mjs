@@ -153,6 +153,29 @@ const LAPORAN_DEMO = [
   },
 ]
 
+/**
+ * Hapus laporan seed lama sebelum menanam yang baru.
+ *
+ * Tanpa ini, menjalankan seed dua kali MENGGANDAKAN seluruh isi demo —
+ * dan itu benar-benar terjadi: dashboard sempat menampilkan tiap laporan
+ * 3 kali. `ON CONFLICT (kode_tiket_hash) DO NOTHING` tidak menolong sama
+ * sekali, karena tiap run membangkitkan kode tiket acak BARU, jadi hash-nya
+ * juga baru dan tidak pernah bentrok.
+ *
+ * Penanda `ai_klasifikasi->>'seed'` dipakai supaya HANYA baris buatan skrip
+ * ini yang dihapus. Laporan hasil uji manual (atau laporan sungguhan, kalau
+ * ada yang salah menjalankan ini di DB berisi) TIDAK tersentuh.
+ */
+async function bersihkanSeedLama() {
+  const { error } = await db
+    .from('laporan_bullying')
+    .delete()
+    .eq('ai_klasifikasi->>seed', 'true')
+
+  if (error) throw new Error(`bersihkan seed lama: ${error.message}`)
+  console.log('✓ seed lama dibersihkan (kalau ada)')
+}
+
 async function laporan() {
   const kode = []
 
@@ -163,8 +186,13 @@ async function laporan() {
     const { error } = await db.from('laporan_bullying').insert({
       kode_tiket_hash: hash(k),
       sekolah_id: SEKOLAH_DEMO,
+      // Skema NYATA tidak punya `korban_id` — kolom itu cuma ada di file 001,
+      // tidak pernah di database. Menyertakannya membuat SELURUH seed gagal
+      // dengan "column not found".
       pelapor_id: null,
-      korban_id: null,
+      nama_korban: null,
+      nama_pelaku: null,
+      nama_saksi: null,
       anonim: true,
       deskripsi: l.deskripsi,
       lokasi: l.lokasi,
@@ -192,7 +220,9 @@ async function laporan() {
     kode_tiket_hash: hash(kLain),
     sekolah_id: SEKOLAH_LAIN,
     pelapor_id: null,
-    korban_id: null,
+    nama_korban: null,
+    nama_pelaku: null,
+    nama_saksi: null,
     anonim: true,
     deskripsi: 'Laporan milik sekolah lain — BK sekolah demo TIDAK boleh melihat ini.',
     lokasi: 'Lapangan',
@@ -200,6 +230,8 @@ async function laporan() {
     ai_jenis: 'VERBAL',
     ai_confidence: 0.7,
     ai_gagal: false,
+    // Penanda seed — dipakai bersihkanSeedLama() supaya rerun tidak menggandakan.
+    ai_klasifikasi: { seed: true },
     urgensi_final: 'SEDANG',
     jenis_final: 'VERBAL',
     flag_krisis: false,
@@ -239,6 +271,8 @@ async function main() {
   }
 
   await sekolah()
+  // WAJIB sebelum menanam: tanpa ini, rerun menggandakan seluruh demo.
+  await bersihkanSeedLama()
   await akunStaf('bk.demo@sahabat.test', sandi.bk, 'Ibu Rina (Guru BK)', SEKOLAH_DEMO)
   await akunStaf('bk.lain@sahabat.test', sandi.bkLain, 'Pak Andi (BK Sekolah Lain)', SEKOLAH_LAIN)
   await akunStaf(

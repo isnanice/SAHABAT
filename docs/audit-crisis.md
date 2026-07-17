@@ -77,6 +77,30 @@ Tanda ✓ berarti sudah terdeteksi hari ini.
 - ✓ "dipaksa berhubungan" / "dipaksa bugil"
 - ✓ "diancam sebar foto"
 
+### Bahaya fisik langsung — **kategori tambahan, mohon dinilai**
+- ✓ "aku hampir dibunuh"
+- ✓ "diancam mau dibunuh"
+- ✓ "dikeroyok"
+- ✓ "ditodong"
+- ✓ "dibacok" / "ditusuk"
+- ✓ "bawa pisau" + kata ancaman di dekatnya
+- ✓ "dipukuli rame-rame"
+
+> **Kenapa kategori ini ditambahkan.** Saat uji coba, seorang penguji menulis
+> *"aku hampir dibunuh, di kantin, baru saja, sudah 3 kali"*. Sistem menandainya
+> KRITIS dan menaikkannya ke puncak antrean Guru BK — **tapi panel darurat tidak
+> muncul**, karena spec asli hanya mendefinisikan krisis sebagai bunuh diri /
+> menyakiti diri / kekerasan seksual. Anak yang baru saja hampir dibunuh sedang
+> dalam bahaya *sekarang*, jadi kategori ini ditambahkan.
+>
+> **Ini di luar spec awal — Bapak/Ibu berhak menolaknya.** Kalau menurut Bapak/Ibu
+> ancaman fisik lebih tepat ditangani lewat jalur laporan biasa (bukan panel
+> darurat), beri tahu dan kami cabut.
+>
+> Yang SENGAJA tidak dimasukkan, supaya alarm tidak terlalu sering berbunyi:
+> - "aku dipukul di kantin" → perundungan fisik biasa, ditangani jalur laporan
+> - "gue dibunuh nyokap kalau telat" → idiom, bukan bahaya (sudah diuji, tidak memicu)
+
 Sistem juga sudah menangani variasi ketikan: **HURUF BESAR**, huruf berulang
 ("matiiii"), dan angka pengganti huruf ("peng3n mati").
 
