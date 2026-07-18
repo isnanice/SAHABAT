@@ -23,11 +23,13 @@ export default function TentangPage() {
     [],
   );
 
-  // Lihat catatan di app/page.js soal link footer yang dihapus.
+  // Empat tautan mengikuti desain citra (lihat catatan di app/page.js).
   const footerLinks = useMemo(
     () => [
+      { label: "Kebijakan Privasi", href: "/privasi" },
+      { label: "Syarat & Ketentuan", href: "/privasi" },
       { label: "Kontak Darurat", href: "/kontak-darurat" },
-      { label: "Privasi & Data", href: "/privasi" },
+      { label: "Pusat Bantuan", href: "/kontak-darurat" },
     ],
     [],
   );
@@ -38,19 +40,19 @@ export default function TentangPage() {
         title: "Perlindungan Anonim",
         text: "Menyediakan saluran pelaporan yang aman dan terenkripsi untuk mencegah retaliasi.",
         iconPath: "/perlindungananonim.svg",
-        iconBg: "#D3E4FE", 
+        iconBg: "var(--sahabat-garis)", 
       },
       {
         title: "Dukungan Sebaya",
         text: "Membangun komunitas siswa yang peduli dan siap mendengarkan cerita teman sebayanya.",
         iconPath: "/dukungansebaya.svg",
-        iconBg: "#D3E4FE", 
+        iconBg: "var(--sahabat-garis)", 
       },
       {
         title: "Intervensi Profesional",
         text: "Menghubungkan kasus-kasus yang membutuhkan perhatian khusus langsung ke Guru BK dengan data yang akurat dan terstruktur.",
         iconPath: "/intervensiprofesional.svg",
-        iconBg: "#D3E4FE", 
+        iconBg: "var(--sahabat-garis)", 
       },
     ],
     [],
@@ -86,7 +88,7 @@ export default function TentangPage() {
         iconBg: "#E7F0FF",
         badgeText: "Profesional Terlatih",
         badgeIconPath: "/profesionalterlatih.svg",
-        badgeColor: "#3b82f6",
+        badgeColor: "var(--sahabat-ungu)",
         badgeBg: "#E9F1FF",
       },
       {
@@ -152,7 +154,7 @@ export default function TentangPage() {
           <div className={styles.heroContentContainer}>
             <div className={styles.heroLeft}>
               <h1 id="hero-heading" className={styles.heroTitle}>
-                Mewujudkan Sekolah Bebas dari Perundungan
+                Mewujudkan Sekolah<br />Bebas dari Perundungan
               </h1>
               <p className={styles.heroDesc}>
                 SAHABAT hadir sebagai ruang aman bagi siswa untuk melaporkan perundungan 
@@ -188,7 +190,7 @@ export default function TentangPage() {
               <span>Visi</span>
             </div>
             <article className={styles.visiCard}>
-              <div className={styles.visiIconWrap} style={{backgroundColor: "#D3E4FE"}}>
+              <div className={styles.visiIconWrap} style={{backgroundColor: "var(--sahabat-garis)"}}>
                 <Image src="/visi.svg" alt="Visi" width={36} height={36} />
               </div>
               <p className={styles.visiDesc}>
@@ -277,11 +279,11 @@ export default function TentangPage() {
       <footer className={styles.footer} role="contentinfo">
         <div className={styles.footerInner}>
           <p className={styles.footerCopyright}>
-            © 2024 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu
+            © 2026 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu
           </p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link.href} className={styles.footerLinkWrap}>
+              <span key={`${link.label}-${index}`} className={styles.footerLinkWrap}>
                 <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && (
                   <span className={styles.footerDot}>•</span>

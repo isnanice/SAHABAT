@@ -12,6 +12,45 @@ const STATUS = {
   DITUTUP: { label: 'Ditutup', kelas: 'bg-gray-100 text-gray-500' },
 }
 
+// Nama jenis untuk ditampilkan (desain memakai istilah ini sebagai judul kartu).
+const JENIS_LABEL = {
+  SIBER: 'Cyber Bullying',
+  FISIK: 'Physical Bullying',
+  VERBAL: 'Verbal Bullying',
+  SOSIAL: 'Social Bullying',
+  SEKSUAL: 'Kekerasan Seksual',
+}
+
+// Timeline "STATUS PERKEMBANGAN" (desain citra). Urutan tetap; yang menyala
+// ditentukan status laporan sekarang. Diturunkan dari status, bukan disimpan
+// terpisah, supaya tidak pernah bertentangan dengan status sebenarnya.
+function bangunTimeline(status) {
+  const urut = { MENUNGGU: 0, DIPROSES: 1, SELESAI: 3, DITUTUP: 3 }
+  const kini = urut[status] ?? 0
+  return [
+    {
+      judul: 'Laporan Dikirim',
+      teks: 'Laporan Anda telah berhasil kami terima secara anonim dan aman.',
+      aktif: kini >= 0,
+    },
+    {
+      judul: 'Sedang Ditinjau',
+      teks: 'Tim kami sedang meninjau detail laporan untuk klasifikasi awal.',
+      aktif: kini >= 1,
+    },
+    {
+      judul: 'Konselor Ditugaskan',
+      teks: 'Guru BK menangani laporanmu dan akan menindaklanjuti.',
+      aktif: kini >= 2,
+    },
+    {
+      judul: 'Tindakan Lanjutan',
+      teks: kini >= 3 ? 'Laporan telah ditindaklanjuti dan ditutup.' : 'Belum tersedia',
+      aktif: kini >= 3,
+    },
+  ]
+}
+
 function formatTanggal(iso) {
   if (!iso) return '-'
   return new Intl.DateTimeFormat('id-ID', {
@@ -81,9 +120,10 @@ export default function CekLaporanPage() {
         </Link>
 
         <div className="rounded-2xl border border-sahabat-garis bg-white p-6 shadow-sm sm:p-8">
-          <h1 className="text-2xl font-bold text-gray-900">Cek Laporan Saya</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Lacak Laporan</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Masukkan kode yang kamu terima saat mengirim laporan.
+            Pantau perkembangan laporan Anda. Masukkan kode tiket yang kamu
+            terima saat mengirim laporan — tanpa login, tetap anonim.
           </p>
 
           <form onSubmit={lacak} className="mt-5">
@@ -127,24 +167,76 @@ export default function CekLaporanPage() {
 
         {tiket && (
           <div className="mt-5 rounded-2xl border border-sahabat-garis bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Header kartu: judul jenis + badge urgensi (desain citra). */}
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-2xl font-bold text-sahabat-tua">
+                {JENIS_LABEL[tiket.jenis] || 'Laporan'}
+              </h2>
+              {(tiket.urgensi === 'KRITIS' || tiket.urgensi === 'TINGGI' || tiket.krisis) && (
+                <span className="rounded-full bg-darurat-muda px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-darurat">
+                  Urgent
+                </span>
+              )}
               <span
-                className={`rounded-full px-3 py-1 text-sm font-semibold ${
+                className={`ml-auto rounded-full px-3 py-1 text-sm font-semibold ${
                   STATUS[tiket.status]?.kelas || 'bg-gray-100 text-gray-700'
                 }`}
               >
                 {STATUS[tiket.status]?.label || tiket.status}
               </span>
-              <span className="text-xs text-gray-500">
-                Dikirim {formatTanggal(tiket.dibuat_at)}
-              </span>
             </div>
+            <p className="mt-1 text-sm text-gray-500">
+              Nomor Tiket: <strong className="font-mono text-gray-700">{kode.trim()}</strong>
+            </p>
 
-            {tiket.krisis && (
-              <p className="mt-3 rounded-xl border border-darurat bg-darurat-muda p-3 text-sm text-gray-800">
-                Laporanmu ditandai <strong>mendesak</strong> untuk Guru BK.
+            <hr className="my-5 border-sahabat-garis" />
+
+            {/* STATUS PERKEMBANGAN — timeline vertikal (desain citra). */}
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Status Perkembangan
+            </h3>
+            <ol className="mt-4 space-y-5">
+              {bangunTimeline(tiket.status).map((langkah, i, arr) => (
+                <li key={i} className="flex gap-3">
+                  <div className="flex flex-col items-center">
+                    <span
+                      className={`mt-0.5 h-3.5 w-3.5 shrink-0 rounded-full ${
+                        langkah.aktif ? 'bg-sahabat' : 'bg-gray-300'
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {i < arr.length - 1 && (
+                      <span
+                        className={`w-0.5 flex-1 ${langkah.aktif ? 'bg-sahabat' : 'bg-gray-200'}`}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </div>
+                  <div className="pb-1">
+                    <p className={`font-semibold ${langkah.aktif ? 'text-gray-900' : 'text-gray-400'}`}>
+                      {langkah.judul}
+                    </p>
+                    <p className={`mt-1 text-sm ${langkah.aktif ? 'text-gray-600' : 'text-gray-400'}`}>
+                      {langkah.teks}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            {/* Catatan Keamanan (desain citra). */}
+            <div className="mt-6 rounded-xl bg-sahabat-latar p-4">
+              <p className="text-sm font-semibold text-gray-900">Catatan Keamanan</p>
+              <p className="mt-1 text-sm text-gray-600">
+                Privasi Anda adalah prioritas kami. Laporan ini tersimpan
+                terenkripsi dan hanya dapat diakses Guru BK yang bertugas. Jika
+                Anda merasa dalam bahaya mendesak, hubungi{' '}
+                <Link href="/kontak-darurat" className="font-medium text-sahabat">
+                  nomor darurat
+                </Link>
+                .
               </p>
-            )}
+            </div>
 
             {/* Isi cerita SENGAJA tidak ditampilkan di sini — endpoint lacak
                 pun tidak mengembalikannya. Kalau kode ini jatuh ke tangan

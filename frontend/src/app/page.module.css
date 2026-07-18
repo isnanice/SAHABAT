@@ -147,16 +147,17 @@
 }
 
 .heroLeft {
-  flex: 1;
-  max-width: 800px;
+  flex: 1.15;
+  max-width: 640px;
   margin-bottom: 60px;
 }
 
 .heroTitle {
-  font-size: clamp(40px, 5vw, 64px);
+  font-size: clamp(40px, 4.4vw, 60px);
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.1;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
   margin-bottom: 24px;
 }
 
@@ -199,7 +200,7 @@
 
 /* Hero Illustration (Chat Simulation) */
 .heroRight {
-  flex: 1;
+  flex: 0.85;
   display: flex;
   justify-content: flex-end;
   align-items: center;

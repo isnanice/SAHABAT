@@ -23,43 +23,44 @@ export default function FiturPage() {
       // jadi tidak dirender sebagai link.
       {
         title: "Ruang Aman",
-        description: "Bingung mulai cerita dari mana? Asisten AI membantumu menyusun kejadiannya jadi laporan yang jelas untuk Guru BK. Kamu tetap anonim, dan sesinya punya ujung.",
+        description: "Privasi Anda adalah prioritas utama kami. Fitur Curhat Anonim memastikan identitas kamu terlindungi saat melaporkan atau berbagi masalah.",
         iconPath: "/ruangaman.svg",
         iconBg: "#E9F1FF",
         href: "/ruang-aman",
-        cta: "Mulai di Ruang Aman",
+        cta: "Mulai Curhat Sekarang",
       },
       {
         title: "Lacak Laporan",
-        description: "Pantau laporanmu pakai kode tiket. Lihat statusnya dan balasan Guru BK, tanpa login dan tanpa menyebut namamu.",
+        description: "Pantau status laporan Anda secara real-time. Ketahui kapan pesan dibaca dan ditindaklanjuti oleh Guru BK.",
         iconPath: "/dukungansebaya.svg",
         iconBg: "#E0F9E8",
         href: "/cek-laporan",
-        cta: "Cek Laporan Saya",
       },
       {
         title: "Ruang Dukungan Sebaya",
-        description: "Forum moderasi tertutup tempat siswa saling mendukung, diawasi Guru BK.",
+        description: "Forum moderasi tertutup di mana siswa dapat saling memberikan dukungan emosional secara aman.",
         iconPath: "/peersupporter.svg",
         iconBg: "#F3E8FF",
-        segera: true,
+        href: "/dukungan-sebaya",
       },
       {
         title: "Konseling BK",
-        description: "Jadwal sesi tatap muka atau online dengan Guru BK, lewat tiket anonimmu.",
+        description: "Jadwal sesi dengan Guru BK, pilih tatap muka atau online. Identitas terlindungi sepenuhnya.",
         iconPath: "/konselingbk.svg",
         iconBg: "#FFDAD6",
-        segera: true,
+        href: "/konseling",
       },
     ],
     [],
   );
 
-  // Lihat catatan di app/page.js soal link footer yang dihapus.
+  // Empat tautan mengikuti desain citra (lihat catatan di app/page.js).
   const footerLinks = useMemo(
     () => [
+      { label: "Kebijakan Privasi", href: "/privasi" },
+      { label: "Syarat & Ketentuan", href: "/privasi" },
       { label: "Kontak Darurat", href: "/kontak-darurat" },
-      { label: "Privasi & Data", href: "/privasi" },
+      { label: "Pusat Bantuan", href: "/kontak-darurat" },
     ],
     [],
   );
@@ -139,7 +140,7 @@ export default function FiturPage() {
                     {card.cta || "Pelajari Lebih Lanjut"} <ArrowUpRight size={20} />
                   </Link>
                 ) : (
-                  <span className={styles.featureLink} style={{ color: "#9ca3af", cursor: "default" }}>
+                  <span className={styles.featureLink} style={{ color: "var(--sahabat-teks-redup)", cursor: "default" }}>
                     Segera hadir
                   </span>
                 )}
@@ -150,17 +151,17 @@ export default function FiturPage() {
           <div className={styles.ctaBanner}>
              <h2 className={styles.ctaTitle}>Sudah Siap Memulai Belum?</h2>
              <p className={styles.ctaDesc}>Gunakan fitur kami sekarang dan ambil langkah pertama menuju ruang yang lebih aman untuk bercerita.</p>
-             <Link href="/lapor" className={styles.ctaBtn}>Lapor Sekarang</Link>
+             <Link href="/ruang-aman" className={styles.ctaBtn}>Mulai Curhat</Link>
           </div>
         </section>
       </main>
 
       <footer className={styles.footer} role="contentinfo">
         <div className={styles.footerInner}>
-          <p className={styles.footerCopyright}>© 2024 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu</p>
+          <p className={styles.footerCopyright}>© 2026 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu</p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link.href} className={styles.footerLinkWrap}>
+              <span key={`${link.label}-${index}`} className={styles.footerLinkWrap}>
                 <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && <span className={styles.footerDot}>•</span>}
               </span>

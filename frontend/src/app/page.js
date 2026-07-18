@@ -59,9 +59,9 @@ export default function RedesignLanding() {
   const featureTextCards = useMemo(
     () => [
       // `href` menentukan tujuan; `segera: true` menandai fitur yang BELUM
-      // dibangun. Sebelumnya keempat kartu memakai href="#pelajari-lebih-lanjut"
-      // yang tidak menuju ke mana pun — termasuk kartu Ruang Aman, sehingga
-      // chatbot-nya tidak terjangkau dari seluruh situs.
+      // dibangun. Keempat kartu sekarang punya halaman sungguhan
+      // (/ruang-aman, /cek-laporan, /dukungan-sebaya, /konseling), jadi
+      // semuanya pakai label "Pelajari Lebih Lanjut" sesuai desain.
       //
       // Kartu tanpa `href` SENGAJA tidak dirender sebagai link. Mengarahkan
       // "Pelajari Lebih Lanjut" ke halaman kosong lebih buruk daripada jujur
@@ -75,7 +75,7 @@ export default function RedesignLanding() {
         imagePath: "/ruangaman.png",
         isLarge: true,
         href: "/ruang-aman",
-        cta: "Mulai di Ruang Aman",
+        cta: "Pelajari Lebih Lanjut",
       },
       {
         title: "Lacak Laporan",
@@ -83,14 +83,15 @@ export default function RedesignLanding() {
         iconPath: "/ruangdukungansebaya.svg",
         iconBg: "#E0F9E8",
         href: "/cek-laporan",
-        cta: "Cek Laporan Saya",
+        cta: "Pelajari Lebih Lanjut",
       },
       {
         title: "Ruang Dukungan Sebaya",
         description: "Forum moderasi tertutup tempat siswa saling mendukung, diawasi Guru BK.",
         iconPath: "/peersupporter.svg",
         iconBg: "#F3E8FF",
-        segera: true,
+        href: "/dukungan-sebaya",
+        cta: "Pelajari Lebih Lanjut",
       },
       {
         title: "Konseling BK",
@@ -99,7 +100,8 @@ export default function RedesignLanding() {
         iconBg: "#FFDAD6",
         imagePath: "/konselingbk.png",
         isLarge: true,
-        segera: true,
+        href: "/konseling",
+        cta: "Pelajari Lebih Lanjut",
       },
     ],
     [],
@@ -129,17 +131,17 @@ export default function RedesignLanding() {
     [],
   );
 
-  // Sebelumnya keempatnya href="#" — tidak melakukan apa pun.
-  // "Kontak Darurat" adalah link paling berbahaya di situs ini kalau mati:
-  // satu-satunya yang mungkin diklik anak yang sedang panik.
-  //
-  // "Syarat & Ketentuan" dan "Pusat Bantuan" DIHAPUS, bukan diberi halaman
-  // kosong. Keduanya butuh isi sungguhan yang belum ada; link ke halaman
-  // kosong cuma memindahkan kekecewaan satu klik lebih jauh.
+  // Urutan & label mengikuti desain citra: empat tautan.
+  // "Kontak Darurat" adalah link paling penting kalau anak sedang panik, jadi
+  // wajib menunjuk halaman sungguhan. "Syarat & Ketentuan" dan "Pusat Bantuan"
+  // belum punya halaman sendiri; sementara diarahkan ke /privasi dan
+  // /kontak-darurat supaya tidak ada tautan mati — bukan href="#".
   const footerLinks = useMemo(
     () => [
+      { label: "Kebijakan Privasi", href: "/privasi" },
+      { label: "Syarat & Ketentuan", href: "/privasi" },
       { label: "Kontak Darurat", href: "/kontak-darurat" },
-      { label: "Privasi & Data", href: "/privasi" },
+      { label: "Pusat Bantuan", href: "/kontak-darurat" },
     ],
     [],
   );
@@ -192,7 +194,7 @@ export default function RedesignLanding() {
         <section aria-labelledby="hero-heading" className={styles.heroSection}>
           <div className={styles.heroLeft}>
             <h1 id="hero-heading" className={styles.heroTitle}>
-              Berani Bercerita, Bersama Kita Atasi
+              Berani Bercerita,<br />Bersama Kita Atasi
             </h1>
             <p className={styles.heroDesc}>
               Kami menyediakan ruang aman, anonim, dan suportif bagi setiap siswa
@@ -205,11 +207,16 @@ export default function RedesignLanding() {
                 halaman LOGIN. Untuk kanal yang seluruh gunanya melapor tanpa
                 identitas, itu kegagalan yang membatalkan produknya. */}
             <div className={styles.heroActions}>
-              <Link href="/lapor" className={styles.ctaBtnPrimary}>
-                Lapor Sekarang
+              {/* Label mengikuti desain citra. "Mulai Curhat Sekarang" ->
+                  /ruang-aman (chat), BUKAN /siswa/* yang kena matcher
+                  middleware. /ruang-aman sengaja di luar matcher, jadi anak
+                  tetap bisa masuk tanpa login. Alur lapornya tidak hilang:
+                  chat -> Tinjau Draft -> kirim ke Guru BK. */}
+              <Link href="/ruang-aman" className={styles.ctaBtnPrimary}>
+                Mulai Curhat Sekarang
               </Link>
-              <Link href="/cek-laporan" className={styles.ctaBtnSecondary}>
-                Cek Laporan Saya
+              <Link href="/fitur" className={styles.ctaBtnSecondary}>
+                Pelajari Lebih Lanjut
               </Link>
             </div>
           </div>
@@ -222,7 +229,7 @@ export default function RedesignLanding() {
                 <div className={styles.chat1}>
                   <div className={styles.chatBubbleWhite}>
                     <p>Halo! Cerita apa<br />yang kamu rasakan?</p>
-                    <div className={styles.chatIconWrap} style={{color: '#2563eb', backgroundColor: '#d4e5ff'}}>
+                    <div className={styles.chatIconWrap} style={{color: 'var(--sahabat-ungu)', backgroundColor: 'var(--sahabat-garis)'}}>
                       <MessageCircle size={14} />
                     </div>
                   </div>
@@ -232,7 +239,7 @@ export default function RedesignLanding() {
                 <div className={styles.chat2}>
                   <div className={styles.chatBubbleBlue}>
                     <p>Aku di-bully teman<br />via WA group...</p>
-                    <div className={styles.chatIconWrap} style={{color: '#2563eb', backgroundColor: '#d4e5ff'}}>
+                    <div className={styles.chatIconWrap} style={{color: 'var(--sahabat-ungu)', backgroundColor: 'var(--sahabat-garis)'}}>
                       <User size={14} />
                     </div>
                   </div>
@@ -242,7 +249,7 @@ export default function RedesignLanding() {
                 <div className={styles.chat3}>
                   <div className={styles.chatBubbleWhite}>
                     <p>Kamu sudah berani sekali mau cerita. Kamu aman di sini, aku dengarkan.</p>
-                    <div className={styles.chatIconWrap} style={{color: '#2563eb', backgroundColor: '#d4e5ff'}}>
+                    <div className={styles.chatIconWrap} style={{color: 'var(--sahabat-ungu)', backgroundColor: 'var(--sahabat-garis)'}}>
                       <MessageCircle size={14} />
                     </div>
                   </div>
@@ -270,8 +277,8 @@ export default function RedesignLanding() {
                       <div className={styles.chatDots}>
                         <div className={styles.chatDot} style={{backgroundColor: '#21c55e'}} />
                         <div className={styles.chatDot} style={{backgroundColor: '#21c55e'}} />
-                        <div className={styles.chatDot} style={{backgroundColor: '#4f46e4'}} />
-                        <div className={styles.chatDot} style={{backgroundColor: '#bebece'}} />
+                        <div className={styles.chatDot} style={{backgroundColor: 'var(--sahabat-ungu)'}} />
+                        <div className={styles.chatDot} style={{backgroundColor: 'var(--sahabat-garis-redup)'}} />
                       </div>
                     </div>
                   </div>
@@ -341,7 +348,7 @@ export default function RedesignLanding() {
                     ) : (
                       <span
                         className={styles.featureLink}
-                        style={{ color: "#9ca3af", cursor: "default" }}
+                        style={{ color: "var(--sahabat-teks-redup)", cursor: "default" }}
                       >
                         Segera hadir
                       </span>
@@ -396,8 +403,8 @@ export default function RedesignLanding() {
               </p>
             </div>
             <div className={styles.bannerAction}>
-              <Link href="/lapor" className={styles.bannerBtn}>
-                Lapor Sekarang
+              <Link href="/ruang-aman" className={styles.bannerBtn}>
+                Mulai Curhat Sekarang
               </Link>
             </div>
             <div className={styles.bannerIll} />
@@ -408,11 +415,11 @@ export default function RedesignLanding() {
       <footer className={styles.footer} role="contentinfo">
         <div className={styles.footerInner}>
           <p className={styles.footerCopyright}>
-            © 2024 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu
+            © 2026 SAHABAT - Sahabat Anti-Bullying dan Bantuan Terpadu
           </p>
           <nav aria-label="Tautan footer" className={styles.footerNav}>
             {footerLinks.map((link, index) => (
-              <span key={link.href} className={styles.footerLinkWrap}>
+              <span key={`${link.label}-${index}`} className={styles.footerLinkWrap}>
                 <Link href={link.href} className={styles.footerLink}>{link.label}</Link>
                 {index < footerLinks.length - 1 && (
                   <span className={styles.footerDot}>•</span>
