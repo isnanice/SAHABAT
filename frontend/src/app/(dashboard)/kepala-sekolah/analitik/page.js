@@ -188,12 +188,12 @@ export default function AnalitikPage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={urgensi} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef0f8" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--sahabat-ungu-muda)" vertical={false} />
                 <XAxis dataKey="nama" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} allowDecimals={false} />
                 <Tooltip
-                  cursor={{ fill: '#f5f7ff' }}
-                  contentStyle={{ borderRadius: 12, border: '1px solid #e5e7f5', fontSize: 13 }}
+                  cursor={{ fill: 'var(--sahabat-latar)' }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid var(--sahabat-garis)', fontSize: 13 }}
                   formatter={(v) => [`${v} laporan`, '']}
                 />
                 <Bar dataKey="jumlah" radius={[6, 6, 0, 0]}>
@@ -214,7 +214,7 @@ export default function AnalitikPage() {
                 layout="vertical"
                 margin={{ top: 4, right: 16, bottom: 4, left: 24 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef0f8" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--sahabat-ungu-muda)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} allowDecimals={false} />
                 <YAxis
                   type="category"
@@ -225,11 +225,11 @@ export default function AnalitikPage() {
                   axisLine={false}
                 />
                 <Tooltip
-                  cursor={{ fill: '#f5f7ff' }}
-                  contentStyle={{ borderRadius: 12, border: '1px solid #e5e7f5', fontSize: 13 }}
+                  cursor={{ fill: 'var(--sahabat-latar)' }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid var(--sahabat-garis)', fontSize: 13 }}
                   formatter={(v) => [`${v} laporan`, '']}
                 />
-                <Bar dataKey="jumlah" fill="#4f46e5" radius={[0, 6, 6, 0]} />
+                <Bar dataKey="jumlah" fill="var(--sahabat-ungu)" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -254,7 +254,7 @@ export default function AnalitikPage() {
                 layout="vertical"
                 margin={{ top: 4, right: 16, bottom: 4, left: 24 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef0f8" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--sahabat-ungu-muda)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} allowDecimals={false} />
                 <YAxis
                   type="category"
@@ -265,11 +265,11 @@ export default function AnalitikPage() {
                   axisLine={false}
                 />
                 <Tooltip
-                  cursor={{ fill: '#f5f7ff' }}
-                  contentStyle={{ borderRadius: 12, border: '1px solid #e5e7f5', fontSize: 13 }}
+                  cursor={{ fill: 'var(--sahabat-latar)' }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid var(--sahabat-garis)', fontSize: 13 }}
                   formatter={(v) => [`${v} laporan`, '']}
                 />
-                <Bar dataKey="jumlah" fill="#6366f1" radius={[0, 6, 6, 0]} />
+                <Bar dataKey="jumlah" fill="var(--sahabat-ungu)" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -281,18 +281,18 @@ export default function AnalitikPage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.tren} margin={{ top: 4, right: 16, bottom: 4, left: -16 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef0f8" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--sahabat-ungu-muda)" vertical={false} />
                 <XAxis dataKey="minggu" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} allowDecimals={false} />
                 <Tooltip
-                  contentStyle={{ borderRadius: 12, border: '1px solid #e5e7f5', fontSize: 13 }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid var(--sahabat-garis)', fontSize: 13 }}
                   formatter={(v) => [`${v} laporan`, '']}
                   labelFormatter={(l) => `Minggu ${l}`}
                 />
                 <Line
                   type="monotone"
                   dataKey="jumlah"
-                  stroke="#4f46e5"
+                  stroke="var(--sahabat-ungu)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />

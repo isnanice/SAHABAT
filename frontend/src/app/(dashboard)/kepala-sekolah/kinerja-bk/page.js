@@ -1,1 +1,5 @@
-export default function Page() { return <main><h1>Kepsek: kinerja-bk</h1></main> }
+import StubDashboard from '@/components/StubDashboard'
+
+export default function Page() {
+  return <StubDashboard judul="Kinerja BK" deskripsi="Metrik responsivitas dan penyelesaian kasus oleh Guru BK." />
+}
