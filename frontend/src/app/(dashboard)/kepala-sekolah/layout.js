@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import HeaderDashboard from '@/components/HeaderDashboard'
+import SidebarDashboard, { NAV_KEPSEK } from '@/components/SidebarDashboard'
 
 export default async function KepalaSekolahLayout({ children }) {
   const supabase = await createClient()
@@ -18,14 +18,17 @@ export default async function KepalaSekolahLayout({ children }) {
 
   if (profile?.role !== 'KEPALA_SEKOLAH' || !profile?.aktif) redirect('/')
 
+  // Shell bersidebar yang sama dengan Guru BK — konsisten dengan desain,
+  // nav difokuskan ke pengawasan Kepala Sekolah.
   return (
-    <div className="min-h-screen bg-gray-50">
-      <HeaderDashboard
-        nama={profile.full_name}
-        peran="Kepala Sekolah"
-        beranda="/kepala-sekolah/analitik"
-      />
-      <main>{children}</main>
-    </div>
+    <SidebarDashboard
+      nama={profile.full_name}
+      nav={NAV_KEPSEK}
+      home="/kepala-sekolah/analitik"
+      bantuan="/kepala-sekolah/analitik"
+      notifikasi="/kepala-sekolah/analitik"
+    >
+      {children}
+    </SidebarDashboard>
   )
 }
