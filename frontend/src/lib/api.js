@@ -72,6 +72,7 @@ async function post(path, body) {
 
 export const api = {
   kirimLaporan: (payload) => post('/api/laporan', payload),
+  ringkasDraft: (transkrip_chat) => post('/api/ai/ringkas', { transkrip_chat }),
   lacakTiket: (kode_tiket) => post('/api/tiket/lacak', { kode_tiket }),
   balasTiket: (kode_tiket, isi) => post('/api/tiket/balas', { kode_tiket, isi }),
   chat: (messages) => post('/api/ai/chatbot', { messages }),
