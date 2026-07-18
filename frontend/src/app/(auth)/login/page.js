@@ -64,7 +64,7 @@ function FormLogin() {
 
     const tujuan = {
       SISWA: "/siswa/edukasi",
-      GURU_BK: "/guru-bk/inbox",
+      GURU_BK: "/guru-bk/dashboard",
       KEPALA_SEKOLAH: "/kepala-sekolah/analitik",
     }[profil.role];
 
@@ -83,7 +83,7 @@ function FormLogin() {
     <div className={styles.card}>
       <div className={styles.logoWrap}>
         <Image src="/logo.png" alt="SAHABAT Logo" width={32} height={32} style={{ height: "auto" }} />
-        <span style={{ color: "#1e40af", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
+        <span style={{ color: "var(--sahabat-ungu-tua)", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
       </div>
 
       <h2 className={styles.cardTitle}>Masuk ke Akun</h2>
@@ -91,8 +91,8 @@ function FormLogin() {
           untuk melapor bisa mengurungkan niatnya di sini — dan jalur lapor
           justru sengaja tidak butuh akun. */}
       <p className={styles.cardSubtitle}>
-        Untuk modul edukasi dan Guru BK. Mau melapor?{" "}
-        <Link href="/lapor">Kamu tidak perlu masuk</Link> — laporan tetap anonim.
+        Masuk untuk mengakses layanan konseling bersama Guru BK secara aman dan
+        rahasia.
       </p>
 
       {/* Sampai di sini dengan ?ganti=1 = sengaja mau berganti akun sementara
@@ -112,7 +112,7 @@ function FormLogin() {
           }}
         >
           Masih ada akun yang sedang masuk di perangkat ini.{" "}
-          <Link href="/keluar" style={{ color: "#4f46e5", fontWeight: 600 }}>
+          <Link href="/keluar" style={{ color: "var(--sahabat-ungu)", fontWeight: 600 }}>
             Keluar dulu
           </Link>{" "}
           sebelum masuk dengan akun lain.
@@ -165,7 +165,7 @@ function FormLogin() {
         </div>
 
         {error && (
-          <p role="alert" style={{ color: "#dc2626", fontSize: 14, marginBottom: 16 }}>
+          <p role="alert" style={{ color: "var(--sahabat-darurat)", fontSize: 14, marginBottom: 16 }}>
             {error}
           </p>
         )}

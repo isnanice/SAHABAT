@@ -59,7 +59,7 @@ export default function ForgotPassword() {
     <div className={styles.card}>
       <div className={styles.logoWrap}>
         <Image src="/logo.png" alt="SAHABAT Logo" width={32} height={32} style={{ height: "auto" }} />
-        <span style={{ color: "#1e40af", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
+        <span style={{ color: "var(--sahabat-ungu-tua)", fontWeight: "bold", fontSize: "18px" }}>SAHABAT</span>
       </div>
 
       <h2 className={styles.cardTitle}>Lupa Kata Sandi</h2>
@@ -103,7 +103,7 @@ export default function ForgotPassword() {
           </div>
 
           {error && (
-            <p role="alert" style={{ color: "#dc2626", fontSize: 14, marginBottom: 16 }}>
+            <p role="alert" style={{ color: "var(--sahabat-darurat)", fontSize: 14, marginBottom: 16 }}>
               {error}
             </p>
           )}
