@@ -1,20 +1,47 @@
 @import "tailwindcss";
 
-/* Token diambil dari desain citra (folder design/). */
+/**
+ * Design tokens — SATU SUMBER, diambil langsung dari file Figma citra
+ * (frame "redesign tinjau draft laporan" dan sekitarnya) lewat MCP Dev Mode.
+ *
+ * Kalau kamu tergoda menulis `bg-[#3525cd]` atau `#ffffff` langsung di JSX,
+ * jangan. Pakai token di sini. Alasannya bukan estetika: kalau designer
+ * memperbarui warna nanti (dan akan), kita ganti di satu tempat, bukan grep.
+ *
+ * Dulu di sini pakai #4f46e5 (indigo-600 default Tailwind) — itu bukan warna
+ * dari Figma. Setiap halaman jadi mirip tapi beda tipis, dan itu terlihat.
+ */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0b1c30;
 
-  --sahabat-ungu: #4f46e5;
-  --sahabat-ungu-tua: #4338ca;
-  --sahabat-ungu-muda: #eef2ff;
-  --sahabat-latar: #f5f7ff;
-  --sahabat-garis: #e5e7f5;
-  --sahabat-abu: #6b7280;
+  /* Ungu utama — tombol primer, link, aksen. */
+  --sahabat-ungu: #3525cd;
+  --sahabat-ungu-tua: #2a1ea6;
+  --sahabat-ungu-muda: #eff4ff;
 
-  /* Merah darurat. Sengaja hanya dipakai panel krisis — kalau dipakai
-     untuk error biasa juga, sinyalnya jadi tumpul saat benar-benar perlu. */
-  --sahabat-darurat: #dc2626;
+  /* Biru muda untuk kartu info dan penekanan lembut. */
+  --sahabat-biru-muda: #eaf1ff;
+
+  /* Latar aplikasi. Sengaja bukan putih murni — mata capek. */
+  --sahabat-latar: #f8f9ff;
+
+  /* Garis pemisah. Redup untuk input, standar untuk kartu. */
+  --sahabat-garis: #d3e4fe;
+  --sahabat-garis-redup: #c7c4d8;
+
+  /* Skala teks. Utama untuk judul, sedang untuk isi, redup untuk label. */
+  --sahabat-teks: #0b1c30;
+  --sahabat-teks-sedang: #464555;
+  --sahabat-teks-redup: #6b6b80;
+
+  /* Hijau sukses — dipakai centang, status selesai. */
+  --sahabat-hijau: #006e2f;
+
+  /* Merah darurat. Sengaja hanya dipakai panel krisis dan urgensi tinggi.
+     Kalau dipakai untuk error biasa juga, sinyalnya jadi tumpul saat
+     benar-benar perlu. */
+  --sahabat-darurat: #ba1a1a;
   --sahabat-darurat-muda: #fef2f2;
 }
 
@@ -24,8 +51,14 @@
   --color-sahabat: var(--sahabat-ungu);
   --color-sahabat-tua: var(--sahabat-ungu-tua);
   --color-sahabat-muda: var(--sahabat-ungu-muda);
+  --color-sahabat-biru: var(--sahabat-biru-muda);
   --color-sahabat-latar: var(--sahabat-latar);
   --color-sahabat-garis: var(--sahabat-garis);
+  --color-sahabat-garis-redup: var(--sahabat-garis-redup);
+  --color-sahabat-teks: var(--sahabat-teks);
+  --color-sahabat-teks-sedang: var(--sahabat-teks-sedang);
+  --color-sahabat-teks-redup: var(--sahabat-teks-redup);
+  --color-sahabat-hijau: var(--sahabat-hijau);
   --color-darurat: var(--sahabat-darurat);
   --color-darurat-muda: var(--sahabat-darurat-muda);
   --font-sans: var(--font-geist-sans);
