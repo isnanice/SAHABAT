@@ -35,14 +35,34 @@ export async function POST(request) {
   const body = await request.json()
   const validated = requestKonselingSchema.parse(body)
 
-  // Cari guru BK yang tersedia
+  // Guru BK harus di sekolah yang sama dengan siswa. Sebelumnya query ini
+  // .limit(1) tanpa filter sekolah — bisa memasangkan siswa ke Guru BK
+  // sekolah lain. RLS (005_perbaikan_grant_konseling_buddy.sql) sudah
+  // menolak itu di lapisan DB, tapi memilih kandidat yang benar dari awal
+  // supaya siswa tidak mendapat error validasi yang membingungkan.
+  const { data: profilSiswa } = await supabase
+    .from('profiles').select('school_id').eq('id', user.id).single()
+
   const { data: gurubk } = await supabase
-    .from('profiles').select('id').eq('role', 'GURU_BK').limit(1).single()
+    .from('profiles')
+    .select('id')
+    .eq('role', 'GURU_BK')
+    .eq('school_id', profilSiswa?.school_id)
+    .eq('aktif', true)
+    .limit(1)
+    .single()
+
+  if (!gurubk) {
+    return NextResponse.json(
+      { error: 'Belum ada Guru BK tersedia di sekolahmu. Coba lagi nanti atau hubungi admin sekolah.' },
+      { status: 503 }
+    )
+  }
 
   const { data, error } = await supabase.from('jadwal_konseling').insert({
     ...validated,
     siswa_id: user.id,
-    guru_bk_id: gurubk?.id,
+    guru_bk_id: gurubk.id,
     status: 'MENUNGGU',
   }).select().single()
 

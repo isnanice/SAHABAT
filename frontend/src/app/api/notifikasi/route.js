@@ -27,7 +27,10 @@ export async function PATCH(request) {
     await supabase.from('notifikasi').update({ dibaca: true })
       .eq('user_id', user.id).eq('dibaca', false)
   } else if (id) {
-    await supabase.from('notifikasi').update({ dibaca: true }).eq('id', id)
+    // Filter user_id eksplisit meski RLS (notifikasi_self_update) sudah
+    // menegakkan ini — query yang jelas maksudnya lebih aman dari perubahan
+    // policy di masa depan yang lupa menyamai batasan ini.
+    await supabase.from('notifikasi').update({ dibaca: true }).eq('id', id).eq('user_id', user.id)
   }
 
   return NextResponse.json({ success: true })
